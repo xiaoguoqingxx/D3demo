@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>D3.js</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+    <p id="target"></p>
+    <div></div>
+    <div></div>
+    <div></div>
+    <!-- <section id="section1">
+        <div><p>blue box</p></div>
+    </section>
+    <section id="section2">
+        <div><p>red box</p></div>
+    </section>  -->   
+    <table class="table">
+        <thead>
+            <tr>
+                <th>时间</th>
+                <th>类型</th>
+                <th>花费</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>10:22</td>
+                <td>Purchase</td>
+                <td>$10.00</td>
+            </tr>
+            <tr>
+                <td>12:22</td>
+                <td>Purchase</td>
+                <td>$15.40</td>
+            </tr>
+            <tr>
+                <td>15:22</td>
+                <td>Purchase</td>
+                <td>$20.10</td>
+            </tr>                        
+        </tbody>
+    </table>
+</body>
+<script type="text/javascript" charset="utf-8">
+    d3.select("p#target").text("Hollo World!");
+    d3.selectAll("div").attr("class","red box").each(function(d,i) {
+        d3.select(this).append("h1").text(i)
+    });
+    // d3.select("#section1>div").attr("class","blue box");
+    // d3.select("#section2").select("div").attr("class","red box");
+
+    var body=d3.select("body");
+    body.append('section').attr("id","section1")
+        .append('div').attr("class","blue box")
+        .append('p').text('blue box');
+    body.append('section').attr("id","section2")
+        .append('div').attr("class","red box")
+        .append('p').text('red box');    
+
+    var rows=d3.selectAll("tr");
+    console.log(rows);
+    var headerElement=rows._groups[0][0];
+    d3.select(headerElement).attr("class","table-header");
+    d3.select(rows._groups[0][1]).attr("class","table-row-odd");
+    d3.select(rows._groups[0][2]).attr("class","table-row-even");
+    d3.select(rows._groups[0][3]).attr("class","table-row-odd");
+</script>
+</html>

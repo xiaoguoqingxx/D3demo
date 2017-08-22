@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>尺度函数-颜色插值</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+  <div id="color" class="clear">
+    <span>线性颜色插值<br></span>
+  </div>
+  <div id="color-diverge" class="clear">
+      <span>分段线性颜色插值<br></span>
+  </div>
+
+</body>
+<script type="text/javascript">
+    var max=21,data=[];
+    var colorScale=d3.scaleLinear()
+        .domain([0,max])
+        .range(["white","#4169e1"]);
+    function divergingScale(pivot) {
+       var divergingColorScale=d3.scaleLinear()
+        .domain([0,pivot,max])//分段线性尺度
+        .range(["white","#4169e1","white"]); 
+        return divergingColorScale;      
+    }
+    for (var i = 0; i < max; ++i){ data.push(i);}
+    function rander(data,scale,selector) {
+       d3.select(selector).selectAll("div.cell").data(data)
+        .enter().append('div').classed("cell", true).append('span');
+       d3.select(selector).selectAll("div.cell").data(data)
+        .exit().remove();
+       d3.select(selector).selectAll("div.cell").data(data)
+        .style("display","inline-block")
+        .style("background-color",function (d) {
+           return scale(d);
+        }).select("span")
+        .text(function (d,i) {
+           return i;
+        })
+    }
+    rander(data,colorScale,"#color");
+    rander(data,divergingScale(5),"#color-diverge");
+</script>
+</html>

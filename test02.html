@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>D3.js 数据</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/d3.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+    <!-- 函数 -->
+    <!-- <div id="container">
+        
+    </div> -->
+    <!-- 数组处理 -->
+    <!-- <div class="code">var array = [3, 2, 11, 7, 6, 4, 10, 8, 15]</div>
+    <div>d3.min => <span id="min"></span></div>
+    <div>d3.max => <span id="max"></span></div>
+    <div>d3.extent => <span id="extent"></span></div>
+    <div>d3.sum => <span id="sum"></span></div>
+    <div>d3.median => <span id="median"></span></div>
+    <div>d3.mean => <span id="mean"></span></div>
+    <div>array.sort(d3.ascending) => <span id="asc"></span></div>
+    <div>array.sort(d3.descending) => <span id="desc"></span></div>
+    <div>d3.quantile(array.sort(d3.ascending), 0.25) => <span id="quantile"></span></div>
+    <div>d3.bisect(array.sort(d3.ascending), 6) => <span id="bisect"></span></div>
+
+    <div class="code">
+<pre>
+    var records = [
+      {date: "2011-11-14T16:17:54Z", quantity: 2, total: 190, tip: 100, type: "tab"},
+      {date: "2011-11-14T16:20:19Z", quantity: 2, total: 190, tip: 100, type: "tab"},
+      {date: "2011-11-14T16:28:54Z", quantity: 1, total: 300, tip: 200, type: "visa"},
+      {date: "2011-11-14T16:30:43Z", quantity: 2, total: 90, tip: 0, type: "tab"},
+      {date: "2011-11-14T16:48:46Z", quantity: 2, total: 90, tip: 0, type: "tab"},
+      {date: "2011-11-14T16:53:41Z", quantity: 2, total: 90, tip: 0, type: "tab"},
+      {date: "2011-11-14T16:54:06Z", quantity: 1, total: 100, tip: 0, type: "cash"},
+      {date: "2011-11-14T16:58:03Z", quantity: 2, total: 90, tip: 0, type: "tab"},
+      {date: "2011-11-14T17:07:21Z", quantity: 2, total: 90, tip: 0, type: "tab"},
+      {date: "2011-11-14T17:22:59Z", quantity: 2, total: 90, tip: 0, type: "tab"},
+      {date: "2011-11-14T17:25:45Z", quantity: 2, total: 200, tip: 0, type: "cash"},
+      {date: "2011-11-14T17:29:52Z", quantity: 1, total: 200, tip: 100, type: "visa"}
+    ];
+
+    d3.nest()
+            .key(function(d){return d.type;})
+            .key(function(d){return d.tip;})
+            .entries(records) =>
+</pre>
+    </div>
+
+    <div>
+        <pre id="nest"></pre>
+    </div> -->
+    <!-- 过滤数据 -->
+    <div class="control-group">
+        <button onclick="select('Retail')">
+            Retail
+        </button>
+        <button onclick="select('Gas')">
+            Gas
+        </button>
+        <button onclick="select('Dining')">
+            Dining
+        </button>
+        <button onclick="select()">
+            Clear
+        </button>
+    </div>
+</body>
+<script type="text/javascript" charset="utf-8">
+    // 针对数组
+    function forArray() {
+        var data=[10,15,30,50,40,30,65,43,30,23,8];
+        function render(data) {
+            // 进入
+            d3.select("body").selectAll("div.h-bar")
+            .data(data)
+            .enter()
+            .append('div').attr("class","h-bar")
+            .append('span');
+            // 更新
+            d3.select("body").selectAll("div.h-bar")
+            .data(data)
+            .style("width",function(d) {
+                console.log(d);
+                return (d*3)+"px";
+            })
+            .select("span").text(function(d) {
+                return d;
+            });
+            // 退出
+            d3.select("body").selectAll("div.h-bar")
+            .data(data)
+            .exit().remove();
+        }
+        setInterval(function() {
+            data.shift();
+            data.push(Math.round(Math.random()*100));
+            render(data);
+        },1500);
+        render(data); 
+    }
+	// 针对对象
+    function forObject() {
+        var obj=[
+        	{width:10,color:23},
+        	{width:15,color:2},
+        	{width:30,color:90},
+        	{width:50,color:54},
+        	{width:40,color:4},
+        	{width:30,color:33},
+        	{width:65,color:60},
+        	{width:43,color:10},
+        	{width:30,color:8},
+        	{width:23,color:30},
+        	{width:8,color:40}
+        ];
+        var colorScale = d3.scale.linear()
+            .domain([0, 100])
+            .range(["#add8e6", "blue"]); // <- B   
+    	function renderTwo(obj) {
+        	// 进入
+        	d3.select("body").selectAll("div.h-bar")
+        	.data(obj)
+        	.enter()
+        	.append('div').attr("class","h-bar")
+        	.append('span');
+        	// 更新
+        	d3.select("body").selectAll("div.h-bar")
+        	.data(obj)
+        	.style("width",function(d) {
+        		return (d.width*5)+"px";
+        	})
+        	.style("background-color",function (d) {
+        		return colorScale(d.color);
+        	})
+        	.select("span").text(function(d) {
+        		return d.width;
+        	});
+        	
+        	// 退出
+        	d3.select("body").selectAll("div.h-bar")
+        	.data(obj)
+        	.exit().remove();
+        }
+    	function value() {
+    		return Math.round(Math.random()*100);
+    	}        
+        setInterval(function() {
+    		obj.shift();
+    		obj.push({width:value(),color:value()});
+    		renderTwo(obj)
+    	},1500);
+    	renderTwo(obj)	 
+    }
+    // 针对函数
+    function forFunction() {
+        var data=[];
+        var next=function(x) {
+            return 15+x*x;
+        };
+        var newData=function () {
+            data.push(next);
+            return data;
+        };
+        function render() {
+            var selection=d3.select("#container")
+            .selectAll("div").data(newData);
+            selection.enter().append("div").append('span');
+            selection.exit().remove();
+            selection.attr("class","v-bar")
+            .style("height",function(d,i) {
+                return d(i)+"px";
+            }).select("span").text(function(d,i) {
+                return d(i);
+            })
+        }
+        setInterval(function() {
+            render()
+        }, 1500);
+        render();
+    }
+    // 处理数组
+    function dealArray() {
+        var array = [3, 2, 11, 7, 6, 4, 10, 8, 15];
+
+        d3.select("#min").text(d3.min(array));
+        d3.select("#max").text(d3.max(array));
+        d3.select("#extent").text(d3.extent(array));
+        d3.select("#sum").text(d3.sum(array));
+        d3.select("#median").text(d3.median(array));
+        d3.select("#mean").text(d3.mean(array));
+        d3.select("#asc").text(array.sort(d3.ascending));
+        d3.select("#desc").text(array.sort(d3.descending));
+        d3.select("#quantile").text(
+            d3.quantile(array.sort(d3.ascending), 0.25)
+        );
+        d3.select("#bisect").text(
+            d3.bisect(array.sort(d3.ascending), 6)
+        );
+
+        var records = [
+            {quantity: 2, total: 190, tip: 100, type: "tab"},
+            {quantity: 2, total: 190, tip: 100, type: "tab"},
+            {quantity: 1, total: 300, tip: 200, type: "visa"},
+            {quantity: 2, total: 90, tip: 0, type: "tab"},
+            {quantity: 2, total: 90, tip: 0, type: "tab"},
+            {quantity: 2, total: 90, tip: 0, type: "tab"},
+            {quantity: 1, total: 100, tip: 0, type: "cash"},
+            {quantity: 2, total: 90, tip: 0, type: "tab"},
+            {quantity: 2, total: 90, tip: 0, type: "tab"},
+            {quantity: 2, total: 90, tip: 0, type: "tab"},
+            {quantity: 2, total: 200, tip: 0, type: "cash"},
+            {quantity: 1, total: 200, tip: 100, type: "visa"}
+        ];
+
+        var nest = d3.nest()
+                .key(function (d) { // <- A
+                    return d.type;
+                })
+                .key(function (d) { // <- B
+                    return d.tip;
+                })
+                .entries(records); // <- C
+        console.log(nest);
+        d3.select("#nest").html(printNest(nest, ""));
+
+        function printNest(nest, out, i) {
+            if(i === undefined) i = 0;
+
+            var tab = ""; for(var j = 0; j < i; ++j) tab += " ";
+
+            nest.forEach(function (e) {
+                if (e.key)
+                    out += tab + e.key + "<br>";
+                else
+                    out += tab + printObject(e) + "<br>";
+
+                if (e.values)
+                    out = printNest(e.values, out, ++i);
+                else
+                    return out;
+            });
+
+            return out;
+        }
+
+        function printObject(obj) {
+            var s = "{";
+            for (var f in obj) {
+                s += f + ": " + obj[f] + ", ";
+            }
+            s += "}";
+            return s;
+        }
+    }
+    // 过滤数据
+    var data = [ // <-A
+        {expense: 10, category: "Retail"},
+        {expense: 15, category: "Gas"},
+        {expense: 30, category: "Retail"},
+        {expense: 50, category: "Dining"},
+        {expense: 80, category: "Gas"},
+        {expense: 65, category: "Retail"},
+        {expense: 55, category: "Gas"},
+        {expense: 30, category: "Dining"},
+        {expense: 20, category: "Retail"},
+        {expense: 10, category: "Dining"},
+        {expense: 8, category: "Gas"}
+    ]; 
+    function render(data,category) {
+        // 进入
+        var selective=d3.select("body").selectAll("div.h-bar")
+        selective.data(data)
+        .enter().append('div').attr("class","h-bar").append('span');
+        // 退出
+        selective.data(data).exit().remove();
+        // 更新
+        selective.data(data)
+        .attr("class","h-bar")
+        .style("width",function(d){
+            return (d.expense*5)+"px";
+        })
+        .select("span").text(function(d) {
+            return d.category;
+        })
+        // 过滤数据
+        selective.filter(function(d,i){
+            return d.category==category
+        })
+        .classed("selected", true);
+    }  
+    render(data,'Retail');
+    function select(category) {
+        render(data,category);
+    }     
+</script>
+</html>

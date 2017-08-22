@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>坐标轴 -- 刻度</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body> 
+  
+</body>
+<script type="text/javascript">
+    var height = 500, 
+        width = 500, 
+        margin = 25,
+        axisWidth = width - 2 * margin;
+    var svg=d3.select("body").append('svg')
+       .attr("class","axis")
+       .attr("width",width)
+       .attr("height",height);
+    var scale=d3.scaleLinear().domain([0,100]).range([0,axisWidth]);
+    var axis=d3.axisTop(scale)
+        .ticks(15)
+        // .tickArguments([15])
+        .tickPadding(6)
+        // .tickSizeOuter(20)
+        // .tickValues([0,20,40,60,80,100])
+        .tickFormat(function(v) {
+          console.log(v);
+           return v;
+        });
+    svg.append('g')
+        .attr("transform",function() {
+           return "translate("+margin+","+margin+")";
+        })
+        .call(axis)
+</script>
+</html>

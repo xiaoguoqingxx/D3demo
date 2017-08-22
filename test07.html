@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>尺度函数-有序尺度</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+  <div id="alphabet" class="clear">
+    <span>Ordinal Scale with Alphabet<br></span>
+    <span>Mapping [1..10] to ["a".."j"]<br></span>
+  </div>
+  <div id="category10" class="clear">
+      <span>Ordinal Color Scale Category 10<br></span>
+      <span>Mapping [1..10] to category 10 colors<br></span>
+  </div>
+  <div id="category20" class="clear">
+      <span>Ordinal Color Scale Category 20<br></span>
+      <span>Mapping [1..10] to category 20 colors<br></span>
+  </div>
+  <div id="category20b" class="clear">
+      <span>Ordinal Color Scale Category 20b<br></span>
+      <span>Mapping [1..10] to category 20b colors<br></span>
+  </div>
+  <div id="category20c" class="clear">
+      <span>Ordinal Color Scale Category 20c<br></span>
+      <span>Mapping [1..10] to category 20c colors<br></span>
+  </div>
+
+</body>
+<script type="text/javascript">
+    /**
+     * [init description]
+     * d3.v3 写法  d3.scale.ordinal() d3.v4 写法 d3.scaleOrdinal()
+     */
+    var max=10,data=[];
+    for (var i = 0; i < max; ++i) data.push(i);
+
+    var alphabet=d3.scaleOrdinal()
+     .domain(data).range(["a","b","c","d","e","f","g","h","i","j"]);
+    function rander(data,scale,selector) {
+       d3.select(selector).selectAll("div.cell").data(data)
+        .enter().append('div').classed("cell", true);
+       d3.select(selector).selectAll("div.cell").data(data)
+        .exit().remove();
+       d3.select(selector).selectAll("div.cell").data(data)
+        .style("display","inline-block")
+        .style("background-color",function (d) {
+           return scale(d).indexOf("#")>=0?scale(d):"white";
+        })
+        .text(function (d) {
+           return scale(d);
+        })
+    }
+    rander(data,alphabet,"#alphabet");
+    rander(data,d3.scaleOrdinal(d3.schemeCategory10),"#category10");
+    rander(data,d3.scaleOrdinal(d3.schemeCategory20),"#category20");
+    rander(data,d3.scaleOrdinal(d3.schemeCategory20b),"#category20b");
+    rander(data,d3.scaleOrdinal(d3.schemeCategory20c),"#category20c");
+</script>
+</html>

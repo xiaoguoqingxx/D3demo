@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>尺度函数-时间尺度</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+  <div id="time" class="clear">
+     <span>线性时间进程<br></span>
+     <span>Mapping [01/01/2013, 12/31/2013] to [0, 1200]<br></span>
+  </div>
+</body>
+<script type="text/javascript">
+    /**
+     * [init description]
+     * d3.v3 写法  d3.scale.time() d3.v4 写法 d3.scaleTime()
+     */
+    var start=new Date("2017-1-10"),
+        end=new Date("2017-10-21"),
+        range=[0,1200],
+        time=d3.scaleTime().domain([start,end]).rangeRound(range),
+        max=12,data=[];
+        console.log(time(10),start)
+    for (var i = 0; i < max; i++) {
+       var date=new Date(start.getTime());
+       date.setMonth(start.getMonth()+i);
+       data.push(date);
+    }
+    function rander(data,scale,selector) {
+       d3.select(selector).selectAll("div.fixed-cell").data(data)
+        .enter().append('div').classed("fixed-cell", true);
+       d3.select(selector).selectAll("div.fixed-cell").data(data)
+        .exit().remove();
+       d3.select(selector).selectAll("div.fixed-cell").data(data)
+        .style("margin-left",function (d) {
+           return scale(d)+"px";
+        })
+        .html(function (d) {
+           var format=d3.timeFormat("%x");
+           return format(d)+"<br/>"+scale(d)+"px";
+        })
+    }
+    rander(data,time,"#time");
+</script>
+</html>

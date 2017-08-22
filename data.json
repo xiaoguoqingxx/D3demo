@@ -1,0 +1,13 @@
+[
+    {"expense": 11, "category": "Dining"},
+    {"expense": 15, "category": "Gas"},
+    {"expense": 34, "category": "Retail"},
+    {"expense": 70, "category": "Dining"},
+    {"expense": 80, "category": "Gas"},
+    {"expense": 65, "category": "Dining"},
+    {"expense": 5, "category": "Gas"},
+    {"expense": 76, "category": "Dining"},
+    {"expense": 88, "category": "Retail"},
+    {"expense": 10, "category": "Dining"},
+    {"expense": 8, "category": "Gas"}
+]

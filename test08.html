@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>尺度函数-字符串插值</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+  <div id="font" class="clear">
+    <span>字体插值器<br></span>
+  </div>
+
+</body>
+<script type="text/javascript">
+    /**
+     * [init description]
+     * d3.v3 写法  d3.scale.ordinal() d3.v4 写法 d3.scaleOrdinal()
+     */
+    var max=11,data=[];
+    var sizeScale=d3.scaleLinear()
+        .domain([0,max])
+        .range([
+              "italic bold 12px/30px Georgia,serif",
+              "italic bold 120px/180px Georgia,serif"
+        ])
+    for (var i = 0; i < max; ++i){ data.push(i);}
+    function rander(data,scale,selector) {
+       d3.select(selector).selectAll("div.cell").data(data)
+        .enter().append('div').classed("cell", true).append('span');
+       d3.select(selector).selectAll("div.cell").data(data)
+        .exit().remove();
+       d3.select(selector).selectAll("div.cell").data(data)
+        .style("display","inline-block").select("span")
+        .style("font",function (d) {
+           return scale(d);
+        })
+        .text(function (d,i) {
+           return i;
+        })
+    }
+    rander(data,sizeScale,"#font");
+</script>
+</html>

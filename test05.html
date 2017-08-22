@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>尺度函数-数值尺度</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+	<div id="linear" class="clear"><span>n</span></div>
+	<div id="linear-capped" class="clear">
+	    <span>1 &lt;= a*n + b &lt;= 20</span>
+	</div>
+	<div id="pow" class="clear"><span>n^2</span></div>
+	<div id="pow-capped" class="clear">
+	    <span>1 &lt;= a*n^2 + b &lt;= 10</span>
+	</div>
+	<div id="log" class="clear"><span>log(n)</span></div>
+	<div id="log-capped" class="clear">
+	    <span>1 &lt;= a*log(n) + b &lt;= 10</span>
+	</div>
+</body>
+<script type="text/javascript">
+    var max=11,data=[];
+    for(var i=1;i<max;++i) data.push(i);
+    // 线性尺度
+    /**
+     * [linear description]
+     * d3.v3 写法  d3.scale.linear() d3.v4 写法 d3.scaleLinear()
+     * domain 定义域  range 值域
+     */
+    var linear=d3.scaleLinear()
+        .domain([1,10])
+        .range([1,10]); //等价尺度  定义域的每个值=值域的每个值 f(n)=a*n+b
+    var linearCapped=d3.scaleLinear()
+		.domain([1,10])
+        .range([1,20]);//f(n)=a*n+b
+    // 幂级尺度
+    /**
+     * d3.v3 写法  d3.scale.pow() d3.v4 写法 d3.scalePow()
+     *  exponent(2) 指数 rangeRound([]) 设置值域并舍入取整
+     */
+    var pow=d3.scalePow().exponent(2);//f(n)=n^2
+    var powCapped=d3.scalePow().exponent(2)
+		.domain([1,10])
+        .rangeRound([1,10]);//f(n)=a*n^2+b
+    //对数尺度
+    /**
+     * [log description]
+     * d3.v3 写法  d3.scale.log() d3.v4 写法 d3.scaleLog()
+     * 默认以10为底
+     */
+    var log=d3.scaleLog();//f(n)=log(n)
+    var logCapped=d3.scaleLog()
+		.domain([1,10])
+        .rangeRound([1,10]);//f(n)=a*log(n)+b 
+    function render(data,scale,selector) {
+    	d3.select(selector).selectAll("div.cell")
+    	.data(data)
+    	.enter().append('div').classed("cell", true);
+		d3.select(selector).selectAll("div.cell")
+    	.data(data).exit().remove();
+		d3.select(selector).selectAll("div.cell")
+    	.data(data).style("display","inline-block")
+    	.text(function(d) {
+    		return Math.round(scale(d),2);
+    	})    	   	
+    }
+    render(data,linear,"#linear");
+    render(data,linearCapped,"#linear-capped");
+    render(data,pow,"#pow");
+    render(data,powCapped,"#pow-capped");
+    render(data,log,"#log");
+    render(data,logCapped,"#log-capped");
+    /**
+     * more scale
+     * quantize 线性离散尺度
+     * threshold 阈值尺度（使用阈值将连续的定义域离散化）
+     * quantile 分位尺度（定义域排序并离散化）
+     * identity 等价尺度（定义域=值域）
+     */
+</script>
+</html>
