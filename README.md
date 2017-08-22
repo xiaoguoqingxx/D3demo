@@ -149,10 +149,10 @@
           d3.scaleOrdinal(d3.schemeCategory20c)
       [d3创建自定义有序颜色尺度]
           d3.scaleOrdinal().range(["#002233","#545454","#9038af"])
-       #字符串插值 test08.html
-       #颜色插值 test09.html
-       #复合对象插值 test10.html
-       #自定义插值器 test11.html 有问题
+    #字符串插值 test08.html
+    #颜色插值 test09.html
+    #复合对象插值 test10.html
+    #自定义插值器 test11.html 有问题
           例：var interpolate= d3.interpolateNumber(0,100);
               interpolate(0.1);//10
               interpolate(0.99);//99 
@@ -171,6 +171,13 @@
               var alphabetScale=d3.scaleLinear()
                 .domain([0,27]).range(["a","z"])
                 .interpolate(d3.interpolateAlphabet); 
+    #量化尺度   d3.scaleQuantize() 
+      例：var color = d3.scaleQuantize()
+              .domain([0, 1])
+              .range(["brown", "steelblue"]);
+          color(0.49); // "brown"
+          color(0.51); // "steelblue"
+      将定义域切割为与值域长度相等的几部分映射到值域 
 ## D3 玩转坐标轴
     #坐标轴创建  test12.html test13.html 
       1.创建svg元素，并添加宽高以及样式
@@ -195,11 +202,14 @@
         .tickSizeOuter([size])  设置外侧刻度大小
     #坐标轴--网格绘制以及动态改变坐标轴scale  test14.html test15.html 
 ## D3 优雅变换
+
     ☞单元素动画  animate01.html
       d3.selection.transition() 定义过渡 
       d3.selection.duration([time(毫秒)]) 定义过渡时间
-      注：transition之前的所有值为起始值  duration等过渡设置后的值为结束值 
+      注：transition之前的所有值为起始值  duration等过渡设置后的值为结束值
+
     ☞多元素动画（数据驱动） animate02.html
+
     ☞使用缓动函数   animate03.html
       使用方法:
         var e=d3.easeLinear;
@@ -241,4 +251,37 @@
       10.弹跳过渡
         d3.easeBounceIn  d3.easeBounce
         d3.easeBounceOut d3.easeBounceInOut 
+
+    ☞中间帧计算  animate04.html
+
+    ☞级联过渡    animate05.html
+      d3.selections.transition().duration(1500).---.transition().duration(1500)
+
+    ☞选择性过渡    animate06.html
+        .transition() // <- A
+        .duration(duration)
+            .style("left", "10px")
+            .filter(function(d){return d == "Cat";}) // <- B
+                .transition() // <- C
+                .duration(duration)
+                    .style("left", "500px");   
+          解释：通过.filter() 将d是'cat'的div拿出来再次过渡 
+
+    ☞监听过渡    animate07.html 
+      例：.on("start", function(){ 
+            d3.select(this).text(function (d, i) {
+                return "动画中";
+            });
+        })
+        .on("end", function(){ // <-E
+            d3.select(this).text(function (d, i) {
+                return "已停止";
+            });
+        })
+      注：.on() 用来监听过渡  
+            start - 过渡开始时.
+            end - 过渡结束后.
+            interrupt - 过渡被中断. 
+          .each() 为过渡中的每个元素调用指定的函数
+          .call() 调用一次指定的函数    
 
