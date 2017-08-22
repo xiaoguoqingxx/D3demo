@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>动画-缓动函数</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body> 
+  
+</body>
+<script type="text/javascript">
+    var data=[
+      "linear","poly","elastic","cubic","cubic-in-out","sin","sin-out","exp","circle","back","bounce"
+    ],
+    colors=d3.scaleOrdinal(d3.schemeCategory10),e;
+    d3.select("body").selectAll("div").data(data).enter()
+      .append('div').attr("class","fixed-cell")
+      .style("top",function (d,i) {
+         return i*40+"px";
+      })
+      .style("color","#000")
+      .style("left","800px")
+      .text(function (d) {
+         return d;
+      });
+    d3.selectAll("div").each(function(d) {
+      switch(d) {
+        case "linear":
+          e=d3.easeLinear;
+          break;
+        case "poly":
+          e=d3.easePoly.exponent(3);
+          break;
+        case "elastic":
+          e=d3.easeElasticIn.amplitude(3.2).period(0.35);
+          break;        
+        case "cubic":
+          e=d3.easeCubic;
+          break;
+        case "cubic-in-out":
+          e=d3.easeCubicInOut;
+          break;
+        case "sin":
+          e=d3.easeSin;
+          break;
+        case "sin-out":
+          e=d3.easeSinOut;
+          break;
+        case "exp":
+          e=d3.easeExp;
+          break;
+        case "circle":
+          e=d3.easeCircle;
+          break;
+        case "back":
+          e=d3.easeBack.overshoot(3.0);
+          break;
+        case "bounce":
+          e=d3.easeBounce;
+          break;
+      } 
+       d3.select(this).transition().ease(e).duration(1500).style("left","100px");
+    });
+</script>
+</html>

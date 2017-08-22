@@ -195,10 +195,50 @@
         .tickSizeOuter([size])  设置外侧刻度大小
     #坐标轴--网格绘制以及动态改变坐标轴scale  test14.html test15.html 
 ## D3 优雅变换
-    例：d3.selectAll("circle").transition()
-    .duration(750)//历时
-    .delay(function(d, i) { return i * 10; })//延迟
-    .attr("r", function(d) { return Math.sqrt(d * scale); })//给元素添加属性;
-
-
+    ☞单元素动画  animate01.html
+      d3.selection.transition() 定义过渡 
+      d3.selection.duration([time(毫秒)]) 定义过渡时间
+      注：transition之前的所有值为起始值  duration等过渡设置后的值为结束值 
+    ☞多元素动画（数据驱动） animate02.html
+    ☞使用缓动函数   animate03.html
+      使用方法:
+        var e=d3.easeLinear;
+        d3.selections.transition().ease(e).duration(1500)
+        in--默认  out--反向 in-out 镜像 out-in 反向镜像
+      1.线性缓动 
+        d3.easeLinear
+      2.多项式过渡
+        d3.easePolyIn  exponent 1--easeLinear 3--easeQuadIn 3--easeCubicIn
+        d3.easePolyOut exponent 1--easeLinear 3--easeQuadOut 3--easeCubicOut
+        d3.easePoly       1--easeLinear 2--easeQuad 3--easeCubic
+        d3.easePolyInOut  1--easeLinear 2--easeQuad 3--easeCubic
+         注：可以指定 指数 .exponent()  
+      3.二次过渡  
+        d3.easeQuadIn    d3.easeQuad
+        d3.easeQuadOut   d3.easeQuadInOut
+      4.三次过渡
+        d3.easeCubicIn   d3.easeCubic
+        d3.easeCubicOut  d3.easeCubicInOut
+      5.正弦过渡
+        d3.easeSinIn     d3.easeSin
+        d3.easeSinOut    d3.easeSinInOut 
+      6.指数过渡
+        d3.easeExpIn     d3.easeExp
+        d3.easeExpOut    d3.easeExpInOut
+      7.圆形过渡
+        d3.easeCircleIn  d3.easeCircle
+        d3.easeCircleOut d3.easeCircleInOut
+      8.弹性过渡
+        d3.easeElasticIn
+        d3.easeElasticOut
+        d3.easeElastic
+        d3.easeElasticInOut
+         注：可以指定amplitude 和 period参数默认为1 和 0.3
+      9.回滚过渡
+        d3.easeBackIn    d3.easeBack
+        d3.easeBackOut   d3.easeBackInOut
+         注：指定overshoot参数
+      10.弹跳过渡
+        d3.easeBounceIn  d3.easeBounce
+        d3.easeBounceOut d3.easeBounceInOut 
 
