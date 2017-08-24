@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>尺度函数-自定义插值 ?有问题</title>
+    <title>尺度函数-自定义插值</title>
     <link rel="stylesheet" href="css/main.css">
     <!--  -->
     <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
@@ -42,27 +42,26 @@
         };
       }
     }; 
-    console.log(d3);  
+     
     var dollorScale=d3.scaleLinear()
       .domain([0,20]).range(["$0","$300"])
       .interpolate(d3.interpolateDollor); 
-    
     function rander(scale,selector) {
        var data=[],max=scale.domain()[1];
-
+       console.log(max)
         for (var i = 0; i < max; ++i){ data.push(i);}
        d3.select(selector).selectAll("div.cell").data(data)
         .enter().append('div').classed("cell", true).append('span');
        d3.select(selector).selectAll("div.cell").data(data)
         .exit().remove();
-       d3.select(selector).selectAll("div.cell").data(data).classed("cell", true)
+       d3.select(selector).selectAll("div.cell").data(data)
         .style("display","inline-block").select("span")
         .text(function (d,i) {
-          console.log(d,scale.domain()[1]);
-           return scale(d);
+             console.log(d,scale);
+            return scale(d);
         })
     }
-    rander(dollorScale,"#dollor");
-    // rander(alphabetScale,"#alphabet");
+    rander(dollorScale,"#dollar");
+    rander(alphabetScale,"#alphabet");
 </script>
 </html>

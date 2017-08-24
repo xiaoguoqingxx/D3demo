@@ -152,7 +152,7 @@
     #字符串插值 test08.html
     #颜色插值 test09.html
     #复合对象插值 test10.html
-    #自定义插值器 test11.html 有问题
+    #自定义插值器 test11.html 问题已解决
           例：var interpolate= d3.interpolateNumber(0,100);
               interpolate(0.1);//10
               interpolate(0.99);//99 
@@ -252,7 +252,16 @@
         d3.easeBounceIn  d3.easeBounce
         d3.easeBounceOut d3.easeBounceInOut 
 
-    ☞中间帧计算  animate04.html
+    ☞中间帧计算  animate04.html  补间函数
+      transition.attrTween()
+      transition.styleTween() 
+      transition.tween()
+      例：.tween("attr.value",function() {
+            var node=this,i = d3.interpolateAbc(node.getAttribute("value"), "z");
+            return function(t) {
+              node.setAttribute("value", i(t));
+            };
+          })
 
     ☞级联过渡    animate05.html
       d3.selections.transition().duration(1500).---.transition().duration(1500)
@@ -283,5 +292,39 @@
             end - 过渡结束后.
             interrupt - 过渡被中断. 
           .each() 为过渡中的每个元素调用指定的函数
-          .call() 调用一次指定的函数    
+          .call() 调用一次指定的函数 
+    ☞自定义插值器过渡 
+       例：
+        --自定义插值器
+          d3.interpolateAbc=function(a, b) { // <-A
+              console.log(a,b);
+            var re = /^([a-z])$/, ma, mb;
+            if ((ma = re.exec(a)) && (mb = re.exec(b))) {
+              a = a.charCodeAt(0);
+              var delta = a - b.charCodeAt(0);
+              return function(t) {
+                return String.fromCharCode(Math.ceil(a - delta * t));
+              };
+            }
+          };
+        --使用自定义插值器
+          .tween("attr.value",function() {
+            var node=this,i = d3.interpolateAbc(node.getAttribute("value"), "z");
+            return function(t) {
+              node.setAttribute("value", i(t));
+            };
+          })
+        注：要使用自定义插值器  则使用 transition.attrTween, transition.styleTween 或者 transition.tween. (补间函数)
+    ☞使用定时器 animate09.html 
+       time=d3.timer(callback, delay（可选）, time（起始时间,可选）) 
+       注：从time之后开始计时 delay之后执行 callback
+         --time.restart(callback, delay, time) 重启定时器-相当于重建
+         --time.stop() 终止当前定时器
+         --d3.timerFlush()  立即调用合法的定时器，可以使用这个方法来立即执行定时器避免闪烁问题。
+         --d3.timeout(callback, delay, time)  只调用一次回调, 之后自动stops
+         --d3.interval(callback, delay, time) 可以设置时间间隔，功能与setInterval类似
+       例：var t = d3.timer(function(elapsed) {
+            console.log(elapsed);
+            if (elapsed > 200) t.stop();
+          }, 150);                    
 

@@ -2,82 +2,47 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>坐标轴 -- 动态调节坐标轴尺度</title>
+    <title>动画-自定义插值器</title>
     <link rel="stylesheet" href="css/main.css">
     <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body> 
-  <div class="control-group">
-    <button onclick="rescale()">ReScale</button>
-</div>
+  
 </body>
 <script type="text/javascript">
-    var height = 500, 
-        width = 500, 
-        margin = 25,
-        xAxis,yAxis,xAxisLength,yAxisLength;
-    var svg=d3.select("body").append('svg')
-       .attr("class","axis")
-       .attr("width",width)
-       .attr("height",height);
-    function renderXAxis() {
-        xAxisLength=width-2*margin;
-        var scale=d3.scaleLinear()
-           .domain([0,100])
-           .range([0,xAxisLength]);
-        xAxis=d3.axisBottom(scale);
-        svg.append('g').attr("class","x-axis")
-           .attr("transform",function() {
-              return "translate("+margin+","+(height-margin)+")";
-           })
-           .call(xAxis);
-    }
-    function renderYAxis(){        
-        yAxisLength = height - 2 * margin;
-        var scale = d3.scaleLinear()
-                        .domain([100,0])
-                        .range([0, yAxisLength]);
-    
-        yAxis = d3.axisLeft(scale);
-            
-        svg.append("g")       
-            .attr("class", "y-axis")
-            .attr("transform", function(){
-                return "translate(" + margin + "," + margin + ")";
-            })
-            .call(yAxis);
-    } 
-    function rescale() {
-       var max=Math.round(Math.random()*100);
-       xAxis.scale().domain([0,max]);
-       yAxis.scale().domain([max, 0]);
-       svg.select("g.x-axis").transition().call(xAxis);
-       svg.select("g.y-axis").transition().call(yAxis);  
-       renderXGridlines();
-       renderYGridlines();
-    }
-
-    function renderXGridlines() {
-        var lines= d3.selectAll("g.x-axis g.tick")
-        .select("line.grid-line").remove();
-        lines=d3.selectAll("g.x-axis g.tick")
-          .append('line').classed("grid-line",true);
-        lines.attr("x1",0).attr("y1",0)
-          .attr("x2",0).attr("y2",-yAxisLength);       
-    }    
-    function renderYGridlines(){
-        var lines = d3.selectAll("g.y-axis g.tick")
-         .select("line.grid-line").remove(); 
+    d3.interpolateAbc=function(a, b) { // <-A
+        console.log(a,b);
+      var re = /^([a-z])$/, ma, mb;
+      if ((ma = re.exec(a)) && (mb = re.exec(b))) {
+        a = a.charCodeAt(0);
+        var delta = a - b.charCodeAt(0);
+        return function(t) {
+          return String.fromCharCode(Math.ceil(a - delta * t));
+        };
+      }
+    };
         
-        lines = d3.selectAll("g.y-axis g.tick")
-          .append("line").classed("grid-line", true)
-                
-        lines.attr("x1", 0).attr("y1", 0)
-            .attr("x2", xAxisLength).attr("y2", 0);
-    }    
-    renderXAxis();
-    renderYAxis();
-    renderXGridlines();
-    renderYGridlines();       
+    var body = d3.select("body");
+    var linear=d3.easeLinear;      
+    var countdown = body.append("div").append("input");
+    
+    countdown.attr("type", "button")
+        .attr("class", "countdown")
+        .style("color","#000")
+        .attr("value", "a") // <-B
+        .transition().ease(linear) // <-C
+        .duration(4000).delay(300)
+        .tween("attr.value",function() {
+           var node=this,i = d3.interpolateAbc(node.getAttribute("value"), "z");
+            return function(t) {
+              node.setAttribute("value", i(t));
+            };
+        })
+        .tween("style.value",function() {
+           var node=this,i = d3.interpolateRgb(node.style.color, "#ff0");
+            return function(t) {
+              node.style.color=i(t);
+            };
+        })               
 </script>
 </html>
