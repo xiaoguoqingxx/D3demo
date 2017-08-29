@@ -391,6 +391,29 @@
       ◆如何进行插值
          d3.area().x().y0().y1().curve([curve方法])
       ◆curve方法 同线条插值   d3.curveBundle失效不可用
+    #圆弧生成器 shape05.html
+      d3.arc().outerRadius([外圈半径]).innerRadius([内圈半径]);
+    #圆弧过渡
+      不能直接过渡，需借助 属性补间函数
+       例：.attrTween("d", function(d){
+            var start={startAngle:0,endAngle:0};
+            var interpolate=d3.interpolate(start, d);
+            return function(t) {
+              return arc(interpolate(t));
+            }
+        });
+    #折线图  graph01.html  
+    #散点图  graph02.html
+      d3.symbol().type([符号方法])  返回得是path 的d属性对应的路径
+      ◆type 符号方法
+        circle    圆      d3.symbolCircle
+        cross     十字    d3.symbolCross
+        diamond   菱形    d3.symbolDiamond
+        square    矩形    d3.symbolSquare
+        triangle  三角形  d3.symbolTriangle
+        star      五角星  d3.symbolStar
+        wye       Y字形   d3.symbolWye
+    #气泡图  graph03.html
 
 
 

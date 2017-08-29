@@ -16,7 +16,7 @@
     <button onclick="render('basis')">basis</button>
     <button onclick="render('basis-open')">basis-open</button>
     <button onclick="render('step')">step</button>
-    <button onclick="render('natural)">natural</button>  
+    <!-- <button onclick="render('natural)">natural</button>   -->
 </div>
 <div class="control-group">
     <button onclick="render('basis-closed')">basis-closed</button>
@@ -112,9 +112,9 @@
         	case "catmullrom-open":
         		str=d3.curveCatmullRomOpen.alpha(bat);
         		break;
-        	case "natural":
-        		str=d3.curveNatural;
-        		break;
+        	// case "natural":
+        	// 	str=d3.curveNatural;
+        	// 	break;
         }   
         var line = d3.line()
                 .curve(str)
