@@ -402,6 +402,8 @@
               return arc(interpolate(t));
             }
         });
+        
+## D3 图表
     #折线图  graph01.html  
     #散点图  graph02.html
       d3.symbol().type([符号方法])  返回得是path 的d属性对应的路径
