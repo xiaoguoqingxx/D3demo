@@ -6,7 +6,7 @@
      #选集迭代： .each()
     	  例：d3.selectAll("div").attr("class","red box").each(function(d,i) {
     	        d3.select(this).append("h1").text(i)
-    	    });
+    	    }); 
      #子元素选择：
         例：d3.select("#section1>div").attr("class","blue box");
             d3.select("#section2").style(...).select("div").attr("class","red box"); 方便分层处理   
@@ -326,5 +326,71 @@
        例：var t = d3.timer(function(elapsed) {
             console.log(elapsed);
             if (elapsed > 200) t.stop();
-          }, 150);                    
+          }, 150);
+
+## D3 优美图形
+    #简单图形 svg基础 shape01.html
+      line-直线元素：属性参数 (x1,y1)起点坐标 (x2,y2) 终点坐标
+      circle-圆：属性参数 (cx,cy) 圆心坐标 r 半径
+      rect-矩形元素：属性参数  (x,y) 左上角坐标 width height 宽高 rx ry 圆角
+      polygon-多边形：属性参数  points 坐标列表（顶点）
+    #svg路径语法
+      ◆ 移动到某一点 M(绝对坐标) m(相对坐标) 
+         例：M(10,10) 移动到10,10位置 m(10,10) 移动到x+10,y+10位置
+      ◆ 闭合路径 Z(绝对坐标) z(相对坐标) 
+      ◆ 连线到某一点 L(绝对坐标) l(相对坐标) 连线
+                    H(绝对坐标) h(相对坐标) 水平连线
+                    V(绝对坐标) v(相对坐标) 垂直连线
+      ◆ 三次贝塞尔曲线 C(绝对坐标) c(相对坐标) 参数(x1 y1 x2 y2 x y) 绘制三次贝塞尔曲线
+                            --x1 y1 起始点控制点  x2 y2 终结点控制点 x y  终结点      
+                      S(绝对坐标) s(相对坐标) 参数(x2 y2 x y) 绘制曲线
+                            --起始点控制点根据上一个终结点控制点与当前操作点决定
+      ◆ 二次贝塞尔曲线 Q(绝对坐标) q(相对坐标) 参数(x1 y1 x y) 绘制二次贝塞尔曲线
+                      T(绝对坐标) t(相对坐标) 参数(x y) 绘制曲线
+      ◆ 椭圆曲线 A(绝对坐标) a(相对坐标) 
+               参数(rx ry x-axis-rotation large-arc-flag sweep-flag x y)
+                  --rx ry x轴半径 y轴半径 x-axis-rotation 以x轴参照旋转角度
+                    large-arc-flag sweep-flag 决定使用椭圆曲线的那一部分
+    #D3线条生成器  d3.line().x().y()  shape02.html
+      例： 定义--var line=d3.line()
+        .x(function(d) {return x(d.x);})
+        .y(function(d) {return x(d.y);})
+          使用--line(绑定的数据)
+    #线条插值 shape03.html
+      ◆如何进行插值
+        d3.line().x().y().curve([curve方法])
+      ◆curve方法
+        1.d3.curveBasis B样条曲线 起点和终点同时也是控制点
+        2.d3.curveBasisOpen B样条开口曲线 起点和终点不控制点
+        3.d3.curveBasisClosed B样条封闭曲线 起点和终点 起点和终点同时也是控制点
+        4.d3.curveBundle 与B样条曲线相同有额外的张力参数 .beta([0,1]) 参数0-1    
+          0为直线，1为标准basic
+        5.d3.curveCardinal 基数样条曲线 起终点为控制点 可用 默认张力为0
+        6.d3.curveCardinalClosed  封闭基数样条曲线 不与两端控制点相交 与其他控制点相交 
+          默认张力为0
+        7.d3.curveCardinalOpen 开放基数样条曲线 起终点不可用 默认张力为0
+            注：5,6,7可以通过 .tension(0.5) 设置张力 
+                张力为1时相当于curveLinear，张力为0时为一个Catmull–Rom曲线
+        8.d3.curveCatmullRom  Catmull Rom样条曲线
+          d3.curveCatmullRomClosed 闭合Catmull Rom样条曲线
+          d3.curveCatmullRomOpen  开放Catmull Rom样条曲线 
+            注：可以通过 .alpha() 设置张力 
+        9.d3.curveLinear 折线
+          d3.curveLinearClosed 闭合折线
+        10.d3.curveMonotoneX y轴方向保持单调性
+          d3.curveMonotoneY x轴方向保持单调性
+        11.d3.curveNatural 自然的三次曲线
+        12.d3.curveStep  台阶折线 y值在两个相邻的点x值中间点发生变化
+           d3.curveStepAfter 水平和垂直交替
+           d3.curveStepBefore  垂直和水平交替
+      ◆设置线条张力  如上所说 每个插值方法有自己的张力方法 1,2,3,9,10,11,12没必要设置张力
+    #区域生成器 shape04.html
+      d3.area().x().y0().y1()
+         x--x坐标序列 y0--下边界序列 y1-上边界序列 y0=y1 使用y即可
+    #区域插值  shape04.html
+      ◆如何进行插值
+         d3.area().x().y0().y1().curve([curve方法])
+      ◆curve方法 同线条插值   d3.curveBundle失效不可用
+
+
 

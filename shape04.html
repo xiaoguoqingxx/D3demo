@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>形状--区域生成器 以及插值</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<h4>区域插值</h4>
+<div class="control-group">
+    <button onclick="render('linear')">linear</button>
+    <button onclick="render('linear-closed')">linear-closed</button>
+    <button onclick="render('step-before')">step-before</button>
+    <button onclick="render('step-after')">step-after</button>
+    <button onclick="render('basis')">basis</button>
+    <button onclick="render('basis-open')">basis-open</button>
+    <button onclick="render('step')">step</button>
+    <button onclick="render('natural)">natural</button>  
+</div>
+<div class="control-group">
+    <button onclick="render('basis-closed')">basis-closed</button>
+    <!-- <button onclick="render('bundle',0.5)">bundle</button> -->
+    <button onclick="render('cardinal',0)">cardinal</button>
+    <button onclick="render('cardinal-open',0.5)">cardinal-open</button>
+    <button onclick="render('cardinal-closed',0.8)">cardinal-closed</button>
+    <button onclick="render('monotonex')">monotonex</button> 
+    <button onclick="render('monotoney')">monotoney</button> 
+    <button onclick="render('catmullrom',0.3)">catmullrom</button>
+    <button onclick="render('catmullrom-open',0.5)">catmullrom-open</button>         
+    <button onclick="render('catmullrom-closed',0)">catmullrom-closed</button>  
+</div>
+</body>
+<script type="text/javascript">
+    var width = 500,
+        height = 500,
+        margin = 30,
+        duration = 500,str,   
+        x = d3.scaleLinear()
+            .domain([0, 10])
+            .range([margin, width - margin]),
+        y = d3.scaleLinear()
+            .domain([0, 10])
+            .range([height - margin, margin]);
+        
+    var data = d3.range(11).map(function(i){
+            return {x: i, y: Math.sin(i)*3+5};
+        });
+    
+    var svg = d3.select("body").append("svg");
+    
+    svg.attr("height", height)
+        .attr("width", width);
+        
+    renderAxes(svg);
+        
+    render("linear");    
+    
+    renderDots(svg)
+    function render(mode,bat){
+        svg.selectAll("path.line").remove();
+        svg.selectAll("path.area").remove();
+        switch(mode) {
+        	case "linear":
+        		str=d3.curveLinear;
+        		break;
+        	case "linear-closed":
+        		str=d3.curveLinearClosed;
+        		break;
+        	case "step-before":
+        		str=d3.curveStepBefore;
+        		break;
+        	case "step":
+        		str=d3.curveStep;
+        		break;
+        	case "step-after":
+        		str=d3.curveStepAfter;
+        		break;
+        	case "basis":
+        		str=d3.curveBasis;
+        		break;
+        	case "basis-open":
+        		str=d3.curveBasisOpen;
+        		break;
+        	case "basis-closed":
+        		str=d3.curveBasisClosed;
+        		break;        
+        	// case "bundle":
+        	// 	str=d3.curveBundle.beta(bat);
+        	// 	break;    
+        	case "cardinal":
+        		str=d3.curveCardinal.tension(bat);
+        		break;  
+        	case "cardinal-open":
+        		str=d3.curveCardinalOpen.tension(bat);
+        		break; 
+        	case "cardinal-closed":
+        		str=d3.curveCardinalClosed.tension(bat);
+        		break; 
+        	case "monotonex":
+        		str=d3.curveMonotoneX;
+        		break;
+        	case "monotoney":
+        		str=d3.curveMonotoneY;
+        		break;  
+        	case "catmullrom":
+        		str=d3.curveCatmullRom.alpha(bat);
+        		break;         	
+        	case "catmullrom-closed":
+        		str=d3.curveCatmullRomClosed.alpha(bat);
+        		break;         	
+        	case "catmullrom-open":
+        		str=d3.curveCatmullRomOpen.alpha(bat);
+        		break;
+        	case "natural":
+        		str=d3.curveNatural;
+        		break;
+        }   
+        var line = d3.line()
+                .curve(str)
+                .x(function(d){return x(d.x);})
+                .y(function(d){return y(d.y);});
+                
+        svg.selectAll("path.line")
+                .data([data])
+            .enter()
+                .append("path")
+                .attr("class", "line");            
+                
+        svg.selectAll("path.line")
+                .data([data]) // <-A                    
+            // .transition().duration(duration).ease(d3.easeLinear) // <-B
+            .attr("d", function(d){
+                return line(d); // <-C
+            });
+            
+        var area = d3.area().curve(str) // <-C
+            .x(function(d) { return x(d.x); }) // <-D
+            .y0(y(0)) // <-E
+            .y1(function(d) { return y(d.y); }); // <-F
+            
+        svg.selectAll("path.area") // <-G
+                .data([data])
+            .enter()
+                .append("path")
+                .attr("class", "area")
+                .attr("d", function(d){
+                  return area(d);
+                }); // <-H
+    }
+    
+    function renderAxes(svg){            
+        var xAxis = d3.axisBottom(d3.scaleLinear().range([0, quadrantWidth()])); 
+        var yAxis = d3.axisLeft(d3.scaleLinear().range([quadrantHeight(), 0]));
+        svg.append("g")        
+            .attr("class", "axis")
+            .attr("transform", function(){
+                return "translate(" + xStart() + "," + yStart() + ")";
+            })
+            .call(xAxis);
+            
+        svg.append("g")        
+            .attr("class", "axis")
+            .attr("transform", function(){
+                return "translate(" + xStart() + "," + yEnd() + ")";
+            })
+            .call(yAxis);
+    }
+    function renderDots(svg) {
+      	svg.append("g").selectAll("circle")
+            .data(data)
+          .enter().append("circle")
+            .attr("class", "dot")
+            .attr("cx", function(d) { return x(d.x); })
+            .attr("cy", function(d) { return y(d.y); })
+            .attr("r", 4.5);
+    }          
+    function xStart(){
+        return margin;
+    }        
+    
+    function yStart(){
+        return height - margin;
+    }
+    
+    function xEnd(){
+        return width - margin;
+    }
+    
+    function yEnd(){
+        return margin;
+    }
+    
+    function quadrantWidth(){
+        return width - 2 * margin;
+    }
+    
+    function quadrantHeight(){
+        return height - 2 * margin;
+    }    
+</script>
+</html>
