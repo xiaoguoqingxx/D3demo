@@ -393,7 +393,11 @@
       ◆curve方法 同线条插值   d3.curveBundle失效不可用
     #圆弧生成器 shape05.html
       d3.arc().outerRadius([外圈半径]).innerRadius([内圈半径]);
-    #圆弧过渡
+       .centroid() 计算参数所表示的弧的中间点[x,y]. 
+              计算方法为(startAngle + endAngle)/2 and(innerRadius + outerRadius)/2
+       .padAngle() 相邻pie之间的间隙
+       .cornerRadius(2) 有间隙时加圆角
+    #圆弧过渡 shape05.html
       不能直接过渡，需借助 属性补间函数
        例：.attrTween("d", function(d){
             var start={startAngle:0,endAngle:0};
@@ -415,7 +419,32 @@
         triangle  三角形  d3.symbolTriangle
         star      五角星  d3.symbolStar
         wye       Y字形   d3.symbolWye
-    #气泡图  graph03.html
+    #气泡图  graph03.html  创建圆形
+    #柱状图  graph04.html  创建矩形
+
+## D3 井然有序（布局）
+    #饼图    graph05.html
+      第一步--创建饼生成器 pie=d3.pie()  
+        .sort() 规定按什么排序
+        .value() 规定访问那个字段的数据
+        .padAngle() 相邻pie之间的间隙
+        pie(data)  访问、加载数据 
+      注：生成一个数据集合 如下
+        [
+          {"data":  1, "value":  1, "startAngle": 6, "endAngle": 6, "padAngle": 0},
+          {"data":  1, "value":  1, "startAngle": 7, "endAngle": 6, "padAngle": 0}...
+        ] 
+      第二步--创建圆弧生成器并添加过渡 arc=d3.src() 详细请看 shape05.html
+      第三步--创建标签--text 元素
+          主要属性有：x,y,dx,dy,rotate,textLength,lengthAdjust
+          x,y表示文本的横纵坐标。
+          dx,dy表示移动的横纵坐标。
+          rotate表示旋转的度数。
+
+
+
+
+
 
 
 
