@@ -440,6 +440,27 @@
           x,y表示文本的横纵坐标。
           dx,dy表示移动的横纵坐标。
           rotate表示旋转的度数。
+    #堆叠面积图  stacked.html graph06.html
+        d3.v4:  有问题
+           d3.stack().order(d3.stackOrderNone).offset(d3.stackOffsetNone);
+          ※keys()  设置或获取keys访问器，由于可能存在多个属性，因此keys是以数组的形式指定
+          ※values() 设置或获取value访问器，stack生成器会根据指定的key依次读取对应的value
+          ※order:排序
+            d3.stackOrderAscending   最小的值(values之和)位于底部 
+            d3.stackOrderDescending  最大的值(values之和)位于底部
+            d3.stackOrderInsideOut   最大的值在内侧，最小的值在外侧，
+                                     这个是针对河流图的，也就是是朝两边同时堆叠的。
+            d3.stackOrderNone        次序是根据keys得到的，相当于没有排序。
+            d3.stackOrderReverse     将原有的key序列翻转
+          ※offset:偏移
+            d3.stackOffsetExpand     将整个堆叠图放在0-1之间，
+                                     也就是上边界和下边界都是常量   
+            d3.stackOffsetNone       以0为基线      
+            d3.stackOffsetSilhouette 上下移动基线，使得整个堆叠图的中心位于基线
+            d3.stackOffsetWiggle     做河流图用的
+        d3.v3:
+           d3.layout.stack().offset('expend')(data); 
+          ※offset:偏移 silhouette wiggle expand zero             
 
 
 
