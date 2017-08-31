@@ -460,7 +460,89 @@
             d3.stackOffsetWiggle     做河流图用的
         d3.v3:
            d3.layout.stack().offset('expend')(data); 
-          ※offset:偏移 silhouette wiggle expand zero             
+          ※offset:偏移 silhouette wiggle expand zero  
+    #箱形图  graph07.html 有问题--图已显示标题显示不出
+      第一步 构建一个具有根节点的新的层级结构数据
+        d3.hierarchy(data)  data是已知的数据  格式要求json
+          d3.hierarchy返回的数据包含以下属性:
+              node.data - 原来传给constructor的数据
+              node.depth - 节点的深度，根节点为0
+              node.height - 节点的高度，叶节点为0
+              node.parent - 节点的父节点，根节点为null
+              node.children - 子节点数组，叶节点没有定义这个属性
+              node.value - 当前节点以及后代节点的总值，通过node.sum设置. 
+          ※.leaves() 返回以当前节点为根节点的子树的所有叶节点
+          ※.ancestors() 以数组的形式放返回当前节点的所有祖先元素
+          ※.descendants() 返回当前节点所有的后代节点
+        如果data格式是CSV格式需要转化
+        d3.stratify()(data) data是CSV格式的json
+           例： 数据格式可以方便的存储在CSV文件中:
+                  name,parent
+                  Eve,
+                  Cain,Eve
+                  Seth,Eve
+                  Enos,Seth
+                  Noam,Seth
+                  Abel,Eve
+                  Awan,Eve
+                  Enoch,Awan
+                  Azura,Eve
+                然后使用d3.csvParse转成json格式的csv数据:
+              var table = d3.csvParse(text);
+                返回:
+                [
+                  {"name": "Eve",   "parent": ""},
+                  {"name": "Cain",  "parent": "Eve"},
+                  {"name": "Seth",  "parent": "Eve"},
+                  {"name": "Enos",  "parent": "Seth"},
+                  {"name": "Noam",  "parent": "Seth"},
+                  {"name": "Abel",  "parent": "Eve"},
+                  {"name": "Awan",  "parent": "Eve"},
+                  {"name": "Enoch", "parent": "Awan"},
+                  {"name": "Azura", "parent": "Eve"}
+                ]
+                然后转为一个hierarchy数据:
+                var root = d3.stratify()
+                    .id(function(d) { return d.name; })
+                    .parentId(function(d) { return d.parent; })
+                    (table);
+         注：布局的时候需要计算节点的值，则必须要先调用node.sum方法
+           例： 
+            circle-packing使用
+              .sum(function(d) { return d.value; })
+              .sort(function(a, b) { return b.value - a.value; });
+            treemaps and icicles中使用
+              .sum(function(d) { return d.value; })
+              .sort(function(a,b){return b.height-a.height||b.value-a.value;});
+            trees and dendrograms中推荐使用
+              .sum(function(d){return d.value;})
+              .sort(function(a,b){return b.height-a.height||a.id.localeCompare(b.id);})
+      第二步 创建treemap生成器
+        d3.treemap()(计算过节点值的层级结构数据)
+          .round(true)  是否启用取整，默认为false
+          .size([_width,_height]) 设置或获取布局尺寸，默认为[1,1]
+          .padding(1)  设置或获取间隔参数，等于同时设置inner 和 outer
+          .paddingInner(1) 设置或获取内部间隔，默认为0
+          .paddingOuter(1) 同时设置外部间隔，默认为0
+          .paddingTop(1) 设置或获取顶部间隔, 默认为0
+          .paddingLeft(1) 设置或获取左部间隔, 默认为0
+          .paddingRight(1) 设置或获取右部间隔, 默认为0
+          .paddingBottom(1) 设置或获取底部间隔, 默认为0
+          .tile(d3.treemapResquarify)  设置或获取tiling method,
+                                       默认为d3.treemapSquarify。
+          ※tiling method
+            d3.treemapBinary 将指定的节点以递归的方式划分为一个大致平衡的二叉树，
+                             如果宽度大于高度则水平划分，如果高度大于宽度则垂直划分。
+            d3.treemapDice   根据每个子节点水平划分矩形，并且顺序是有序的。
+            d3.treemapSlice  根据每个子节点垂直划分矩形，并且顺序是有序的。
+            d3.treemapSliceDice 指定的节点深度为奇数则使用treemapSlice否则使用treemapDice
+            d3.treemapSquarify 这种方法可以用以产生宽高比相等的矩形分区。
+            d3.treemapResquarify 与"treemapSquarify"类似，不会改变矩形的位置，只调整大小。
+      第三步 在选择的元素里加载数据
+        .data(xxx.leaves())
+          .leaves() 返回以当前节点为根节点的子树的所有叶节点
+
+
 
 
 
