@@ -127,18 +127,18 @@
 	    		    .attr("clip-path","url(#body-clip)")
 	    	}
 	    	// 创建堆叠数据
-	    	// var stack=d3.stack().order(d3.stackOrderNone).offset(d3.stackOffsetNone);
-	    	renderLines();
-	    	renderAreas();
+	    	var stack=d3.stack().keys(["y","y1","y2"]).order(d3.stackOrderNone).offset(d3.stackOffsetNone);
+	    	renderLines(stack(_data));
+	    	renderAreas(stack(_data));
 	    	
-	    } 
+	    }
 	    // 线条渲染函数
-	    function renderLines() {
+	    function renderLines(stacks) {
 	    	_line=d3.line()
-	    	 .x(function(d) {return _x(d.x);})
-	    	 .y(function(d) {return _y(d.y);});
+	    	 .x(function(d) {return _x(d.data.x);})
+	    	 .y(function(d) {return _y(d[1]);});
 	    	_bodyG.selectAll("path.line")
-	    	 .data(_data)
+	    	 .data(stacks)
 	    	 .enter()
 	    	 .append('path')
 	    	 .style("stroke",function(d,i) {
@@ -146,22 +146,22 @@
 	    	 })
 	    	 .attr("class","line");
 	    	_bodyG.selectAll("path.line")
-	    	 .data(_data)
+	    	 .data(stacks)
 	    	 .transition()
 	    	 .attr("d",function(d) {
 	    	 	return _line(d);
 	    	 }); 
 	    }
 	    // 区域渲染
-	    function renderAreas() {
+	    function renderAreas(stacks) {
 	    	_area=d3.area()
-	    	 .x(function(d) {return _x(d.x);})
+	    	 .x(function(d) {return _x(d.data.x);})
 	    	 .y0(function(d) {
-	    	 	return _y(d.y0)
+	    	 	return _y(d[0])
 	    	 })
-	    	 .y1(function(d) {return _y(d.y);});
+	    	 .y1(function(d) {return _y(d[1]);});
 	    	_bodyG.selectAll("path.area")
-	    	 .data(_data)
+	    	 .data(stacks)
 	    	 .enter()
 	    	 .append('path')
 	    	 .style("fill",function(d,i) {
@@ -169,7 +169,7 @@
 	    	 })
 	    	 .attr("class","area")
 			_bodyG.selectAll("path.area")
-	    	 .data(_data)
+	    	 .data(stacks)
 	    	 .transition()
 	    	 .attr("d",function(d) {(d)
 	    	 	return _area(d);
@@ -209,29 +209,39 @@
 	    numberOfDataPoint = 51,
 	    data = [];
     var chart=stackedAreaChart()
-        .x(d3.scaleLinear().domain([0,numberOfDataPoint - 1])) 
-        .y(d3.scaleLinear().domain([0,26]));		
-   	for (var s = 0; s < numberOfSeries; ++s)
-	    data.push(d3.range(numberOfDataPoint).map(function (i) {
-	    	if(s==0){
-	    		return {x: i, y:randomData(),y0:0,id:s};
-	    	}else{
-	    		return {x: i, y:data[s-1][i].y+randomData(),y0:data[s-1][i].y,id:s};
-	    	}
-	    }));
+        .x(d3.scaleLinear().domain([0,numberOfDataPoint-1])) 
+        .y(d3.scaleLinear().domain([0,60]));		
+   	for (var s = 0; s <numberOfDataPoint; ++s)
+	    data.push({x:s,y:randomData()});
+	data.forEach(function(val,k) {
+		var random=val.y+randomData();
+		val.y1=random;
+		val.y2=random+randomData();
+	})
+	// for (var i = 0; i < numberOfSeries; ++i)
+	//     data.push(d3.range(numberOfDataPoint).map(function (i) {
+	//         return {x: i, y: randomData()};
+	//     }));
     console.log(data)
+ //    function update() {
+	//     for (var i = 0; i < data.length; ++i) {
+	//         var series = data[i];
+	//         series.length = 0;
+	//         for (var j = 0; j < numberOfDataPoint; ++j)
+	//             series.push({x: j, y: randomData()});
+	//     }
+
+	//     chart.render();
+	// }
 	function update() {
 	    for (var i = 0; i < data.length; ++i) {
 	        var series = data[i];
-	        series.length = 0;
-	        for (var j = 0; j < numberOfDataPoint; ++j)
-	        	if(i==0){
-					series.push({x: j,y0:0,y: randomData(),id:i});
-	        	}else{
-	        		series.push({x: j,y0:data[i-1][j].y,y:data[i-1][j].y+randomData(),id:i});
-	        	}
-	            
+	        console.log(series)
+	        series.y=randomData();
+	        series.y1=series.y+randomData();
+	        series.y2=series.y1+randomData();
 	    }
+
 	    chart.render();
 	}
     

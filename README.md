@@ -441,7 +441,7 @@
           dx,dy表示移动的横纵坐标。
           rotate表示旋转的度数。
     #堆叠面积图  stacked.html graph06.html
-        d3.v4:  有问题
+        d3.v4:  问题已初步解决
            d3.stack().order(d3.stackOrderNone).offset(d3.stackOffsetNone);
           ※keys()  设置或获取keys访问器，由于可能存在多个属性，因此keys是以数组的形式指定
           ※values() 设置或获取value访问器，stack生成器会根据指定的key依次读取对应的value
