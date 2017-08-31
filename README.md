@@ -541,6 +541,19 @@
       第三步 在选择的元素里加载数据
         .data(xxx.leaves())
           .leaves() 返回以当前节点为根节点的子树的所有叶节点
+    #树图    graph08.html 有问题--点击节点收起的问题
+      第一步 构建一个具有根节点的新的层级结构数据
+        d3.hierarchy(data)  data是已知的数据  格式要求json
+      第二步 构建树结构生成器
+        d3.tree()(data)
+          .size() 设置或获取布局尺寸
+        ※node.links()
+          返回以当前节点为根节点的子树中所有的连接(边)，每个连接都有source和target属性组成，source表示连接的父节点，target表示连接的子节点。
+      第三步 构建线生成器 https://github.com/xswei/d3js_doc/tree/master/API/d3-shape-master#custom-curves
+        例：_link = d3.linkHorizontal()
+          .x(function(d) { return d.y; })
+          .y(function(d) { return d.x; });
+
 
 
 

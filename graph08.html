@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>井然有序--树图</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+    <div class="control-group">
+	    <button onclick="largeFlare()">Complete Flare</button>
+	    <button onclick="simpleFlare()">Small Flare</button>
+	</div>
+  
+</body>
+<script type="text/javascript">
+    function tree() {
+		var _chart={};
+		var _width=1600,_height=800,
+		_margins={top:30,left:30,right:30,bottom:30},
+		_svg,_bodyG,_nodes,_i=0,_tree,_link;    			
+	  	// 图表渲染
+	    _chart.render=function(){
+	    	if(!_svg){
+	    		_svg=d3.select("body").append('svg')
+	    		     .attr("height",_height)
+	    		     .attr("width",_width);
+	    	}
+	    	renderBody(_svg);
+	    };
+	    
+	    // 图表主体渲染函数
+	    function renderBody(svg) {
+	    	if(!_bodyG){
+	    		_bodyG=svg.append('g')
+	    		    .attr("class","body")
+	    		    .attr("transform",function(d) {
+	    		    	return "translate("+_margins.left+","+_margins.top+")"
+	    		    });
+	    	}
+	    	_tree=d3.tree().size([
+	    		    (_height-_margins.top-_margins.bottom),
+	    		    (_width-_margins.left-_margins.right)
+	    		])
+	    	var hierarchy=d3.hierarchy(_nodes);
+            var trees=_tree(hierarchy
+                .sum(function(d){return d.value;})
+                .sort(function(a, b) { return (a.height - b.height) || a.data.name.localeCompare(b.data.name); }));
+            _link = d3.linkHorizontal()
+			    .x(function(d) { return d.y; })
+			    .y(function(d) { return d.x; });
+	    	render(trees,_link);
+	    	
+	    } 
+	    // 树形
+	    function render(nodes) {
+	    	renderNodes(nodes);
+	    	renderLinks(nodes); 
+	    }
+	 	function renderNodes(nodes) {
+	        nodes.descendants().forEach(function (d) {
+	            d.y = d.depth * 180;
+	        });
+	        var node = _bodyG.selectAll("g.node")
+	                .data(nodes.descendants());
+
+	        var nodeEnter = node.enter().append("svg:g")
+	                .attr("class", "node")
+	                .attr("transform", function (d) {
+	                    return "translate(" + d.y 
+							+ "," + d.x + ")";
+	                })
+	                .on("click", function (d) {
+	                	console.log(d);
+	                    toggle(d);
+	                    
+	                });
+
+	        nodeEnter.append("svg:circle")
+	                .attr("r", 1e-6)
+	                .style("fill", function (d) {
+	                    return d.children ? "lightsteelblue" : "#fff";
+	                });
+
+	        var nodeUpdate = node.transition()
+	                .attr("transform", function (d) {
+	                    return "translate(" + d.y + "," + d.x + ")";
+	                });
+
+	        nodeUpdate.select("circle")
+	                .attr("r", 4.5)
+	                .style("fill", function (d) {
+	                    return d.children ? "lightsteelblue" : "#fff";
+	                });
+
+	        var nodeExit = node.exit().transition()
+	                .attr("transform", function (d) {
+	                    return "translate(" + d.y 
+							+ "," + d.x + ")";
+	                })
+	                .remove();
+
+	        nodeExit.select("circle")
+	                .attr("r", 1e-6);
+
+	        renderLabels(nodeEnter, nodeUpdate, nodeExit);
+
+	        nodes.descendants().forEach(function (d) {
+	            d.x0 = d.x;
+	            d.y0 = d.y;
+	        });
+	    }
+
+	    function renderLabels(nodeEnter, nodeUpdate, nodeExit) {
+	        nodeEnter.append("svg:text")
+	                .attr("x", function (d) {
+	                    return d.children? -10 : 10;
+	                })
+	                .attr("dy", ".35em")
+	                .attr("text-anchor", function (d) {
+	                    return d.children? "end" : "start";
+	                })
+	                .text(function (d) {
+	                    return d.data.name;
+	                })
+	                .style("fill-opacity", 1e-6);
+
+	        nodeUpdate.select("text")
+	                .style("fill-opacity", 1);
+
+	        nodeExit.select("text")
+	                .style("fill-opacity", 1e-6);
+	    }  
+		function renderLinks(nodes) {
+	        var link = _bodyG.selectAll("path.link")
+	                .data(nodes.links());
+
+	        link.enter().insert("svg:path", "g")
+	                .attr("class", "link")
+	                .attr("d", function (d) {
+	                     return _link(d);
+	                });
+
+	        link.transition()
+	                .attr("d", _link);
+
+	        link.exit().transition()
+	                .attr("d", function (d) {
+	                    return _link(d);
+	                })
+	                .remove();
+	    }
+
+	    function toggle(d,node) {
+	        if (d.children) {
+	            d._children = d.children;
+	            d.children = null;
+	            
+	        } else {
+	            d.children = d._children;
+	            d._children = null;
+	        }
+	    }
+
+	    function toggleAll(d) {
+	        if (d.children) {
+	            d.children.forEach(toggleAll);
+	            toggle(d);
+	        }
+	    }	          
+	    _chart.width = function (w) {
+            if (!arguments.length) return _width;
+            _width = w;
+            return _chart;
+        };
+
+        _chart.height = function (h) {
+            if (!arguments.length) return _height;
+            _height = h;
+            return _chart;
+        };
+        _chart.nodes = function (n) {
+            if (!arguments.length) return _nodes;
+            _nodes = n;
+            return _chart;
+        };
+		_chart.margins = function (m) {
+	        if (!arguments.length) return _margins;
+	        _margins = m;
+	        return _chart;
+	    };        
+	    
+	    return _chart;
+	}
+	function randomData() {
+	    return Math.random() * 9;
+	}
+
+    var chart = tree();
+
+    function largeFlare() {
+        d3.json("flare.json", function (nodes) {
+            chart.nodes(nodes).render();
+        });
+    }
+
+    function simpleFlare() {
+        d3.json("simple-flare.json", function (nodes) {
+            chart.nodes(nodes).render();
+        });
+    }
+</script>
+</html>
