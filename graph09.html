@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>图表--封闭图</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+    <div class="control-group">
+	    <button onclick="largeFlare()">Complete Flare</button>
+	    <button onclick="simpleFlare()">Small Flare</button>
+	</div>  
+</body>
+<script type="text/javascript">
+    function pack() {
+		var _chart={};
+		var _width=1280,_height=800,
+		_colors=d3.scaleOrdinal(d3.schemeCategory10),
+		_svg,_bodyG,_nodes,_r=720,
+		_x=d3.scaleLinear().range([0, _r]),
+		_y=d3.scaleLinear().range([0, _r]);
+		 _chart.width = function (w) {
+            if (!arguments.length) return _width;
+            _width = w;
+            return _chart;
+        };
+
+        _chart.height = function (h) {
+            if (!arguments.length) return _height;
+            _height = h;
+            return _chart;
+        };
+
+        _chart.r = function (r) {
+            if (!arguments.length) return _r;
+            _r = r;
+            return _chart;
+        };
+
+        _chart.nodes = function (n) {
+            if (!arguments.length) return _nodes;
+            _nodes = n;
+            return _chart;
+        };
+    			
+	  	// 图表渲染
+	    _chart.render=function(){
+	    	if(!_svg){
+	    		_svg=d3.select("body").append('svg')
+	    		     .attr("height",_height)
+	    		     .attr("width",_width);
+	    	}
+	    	renderBody(_svg);
+	    };
+	    // 图表主体渲染函数
+	    function renderBody(svg) {
+	    	if(!_bodyG){
+	    		_bodyG=svg.append('g')
+	    		    .attr("class","body")
+	    		    .attr("transform",function function_name(argument) {
+	    		    	return "translate("+(_width-_r)/2+","+(_height-_r)/2+")";
+	    		    });
+	    	}
+	    	var pack=d3.pack()
+	    	.size([_r,_r])
+	    	.padding(3);
+	    	var hierarchy=d3.hierarchy(_nodes);
+	    	pack(hierarchy
+	    	  .sum(function(d) { console.log(d);return d.size; })
+              .sort(function(a, b) { return b.value - a.value; }));
+	    	renderCircles(hierarchy);
+	    	renderLabels(hierarchy);
+	    } 
+	    // 渲染圆
+	    function renderCircles(nodes) {
+
+            _bodyG.selectAll("circle")
+                    .data(nodes.descendants()).enter().append("svg:circle")
+            _bodyG.selectAll("circle")
+                    .data(nodes.descendants()).transition()
+                .attr("class", function (d) {
+                    return d.children ? "parent" : "child";
+                })
+                .attr("stroke",function(d) {
+                	return _colors(d.depth);
+                })
+                .attr("cx", function (d) {return d.x;})
+                .attr("cy", function (d) {return d.y;})
+                .attr("r", function (d) {return d.r;});
+
+            _bodyG.selectAll("circle")
+                    .data(nodes.descendants()).exit().transition()
+                    .attr("r", 0)
+                    .remove();	    		    		
+        }
+        // 渲染标签
+        function renderLabels(nodes) {
+            _bodyG.selectAll("text")
+                    .data(nodes.descendants()).enter().append("svg:text")
+                    .attr("dy", ".35em")
+                    .attr("stroke","black")
+                    .attr("stroke-width",1)
+                    .attr("text-anchor", "middle");
+                    // .style("opacity", 0)
+
+            _bodyG.selectAll("text")
+                    .data(nodes.descendants()).transition()
+                    .attr("class", function (d) {
+                        return d.children ? "parent" : "child";
+                    })
+                    .attr("x", function (d) {return d.x;})
+                    .attr("y", function (d) {return d.y;})
+                    .attr("stroke",function (d) {
+                    	return _colors(d.depth);
+                    })
+                    .text(function (d) {return d.data.name.substring(0, d.r / 3);});
+                    // .style("opacity", function (d) {
+                    // 	console.log(d.data.name.length,d.r);
+                    //     return d.data.name.length > d.r*2 ? 1 : 0;
+                    // })
+
+            _bodyG.selectAll("text")
+                    .data(nodes.descendants()).exit().remove();	    		    		
+        }	    
+	    return _chart;
+	}
+	var chart = pack();
+
+    function largeFlare() {
+        d3.json("flare.json", function (nodes) {
+            chart.nodes(nodes).render();
+        });
+    }
+
+    function simpleFlare() {
+        d3.json("simple-flare.json", function (nodes) {
+            chart.nodes(nodes).render();
+        });
+    }     
+</script>
+</html>

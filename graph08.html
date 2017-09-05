@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>井然有序--树图</title>
+    <title>井然有序--树图 ?</title>
     <link rel="stylesheet" href="css/main.css">
     <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
 </head>
@@ -43,13 +43,13 @@
 	    		    (_width-_margins.left-_margins.right)
 	    		])
 	    	var hierarchy=d3.hierarchy(_nodes);
-            var trees=_tree(hierarchy
+            _tree(hierarchy
                 .sum(function(d){return d.value;})
                 .sort(function(a, b) { return (a.height - b.height) || a.data.name.localeCompare(b.data.name); }));
             _link = d3.linkHorizontal()
 			    .x(function(d) { return d.y; })
 			    .y(function(d) { return d.x; });
-	    	render(trees,_link);
+	    	render(hierarchy);
 	    	
 	    } 
 	    // 树形
@@ -71,9 +71,23 @@
 							+ "," + d.x + ")";
 	                })
 	                .on("click", function (d) {
-	                	console.log(d);
-	                    toggle(d);
-	                    
+	                	nodes.each(function(s,i) {
+	                		// console.log(s);
+	                		if(s.data.name==d.data.name){
+								if (s.children!==null) {
+						            s._children = s.children;
+						            s.children = null;
+						            
+						        } else {
+						            s.children = s._children;
+						            s._children = null;
+						        }	                			
+	                		}else{
+								s.children = s.children;
+						        s._children = null;	                			
+	                		}
+	                	})
+	                    render(nodes);
 	                });
 
 	        nodeEnter.append("svg:circle")
@@ -122,14 +136,14 @@
 	                })
 	                .text(function (d) {
 	                    return d.data.name;
-	                })
-	                .style("fill-opacity", 1e-6);
+	                });
+	                // .style("fill-opacity", 1e-6)
 
-	        nodeUpdate.select("text")
-	                .style("fill-opacity", 1);
+	        // nodeUpdate.select("text")
+	        //         .style("fill-opacity", 1);
 
-	        nodeExit.select("text")
-	                .style("fill-opacity", 1e-6);
+	        // nodeExit.select("text")
+	        //         .style("fill-opacity", 1e-6);
 	    }  
 		function renderLinks(nodes) {
 	        var link = _bodyG.selectAll("path.link")
@@ -151,8 +165,8 @@
 	                .remove();
 	    }
 
-	    function toggle(d,node) {
-	        if (d.children) {
+	    function toggle(d) {
+	        if (d.children!==null) {
 	            d._children = d.children;
 	            d.children = null;
 	            

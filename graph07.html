@@ -9,10 +9,10 @@
 <body>
     <div class="control-group">
 	    <button onclick="largeFlare()">Complete Flare</button>
-	    <!--
+	    
 	    <button onclick="simpleFlare()">Small Flare</button>
-	    -->
-	    <button onclick="flip(chart)">Flip Value vs. Count</button>
+	    
+	    <!-- <button onclick="flip(chart)">Flip Value vs. Count</button> -->
 	</div>
   
 </body>
@@ -26,7 +26,7 @@
 			return 1;
 		},
 		_colors=d3.scaleOrdinal(d3.schemeCategory20c),
-		_svg,_bodyG,_node;    			
+		_svg,_bodyG,_nodes;    			
 	  	// 图表渲染
 	    _chart.render=function(){
 	    	if(!_svg){
@@ -49,6 +49,7 @@
 	    	}
 	    	var hierarchy=d3.hierarchy(_nodes);
             _treemap(hierarchy
+            	.eachBefore(function(d) { d.data.id = (d.parent ? d.parent.data.id + "." : "") + d.data.name; })
                 .sum(function(d) { return d.size; })
                 .sort(function(a, b) { 
                 	return b.height - a.height || b.value - a.value; 
@@ -57,9 +58,10 @@
 	    } 
 	    // 箱形
 	    function renderCells(svg,hierarchy) {
+	    	svg.selectAll("g.cell").remove()
             svg.selectAll("g.cell").data(hierarchy)
                .enter().append('g')
-	    	   .attr("class","cell").append('rect').append('text')
+	    	   .attr("class","cell").append('rect')
 	    	svg.selectAll("g.cell").data(hierarchy).transition().attr("transform",function (d) {
 	    		return "translate("+d.x0+","+d.y0+")";
 	    	  }).select("rect")
@@ -72,21 +74,14 @@
 			  .attr("fill",function(d) {
               	 return _colors(d.parent.data.name);
               }); 
-
-			svg.selectAll("g.cell").data(hierarchy).select("text")
-			  // .attr("x",function(d){return (d.x1-d.x0)/2;})
-			  // .attr("y",function(d){return (d.y1-d.y0)/2;})
-			  // .attr("dy",".35em")
-			  .attr("text-anthor","middle")
-			  .text(function(d) {
-			  	 return d.data.name;
-			  })		  
-			  .style("opacity",function(d) {
-			  	d.w=this.getComputedTextLength();
-			  	return d.x1>d.w?1:0;
-			  });
+			svg.selectAll("g.cell").data(hierarchy).append("text").selectAll("tspan")
+			.data(function(d) {return d.data.name.split(/(?=[A-Z][^A-Z])/g);})
+				  .enter().append("tspan")
+			      .attr("x", 4)
+			      .attr("y", function(d, i) { return 13 + i * 10; })
+			      .text(function(d) { return d; });	
 			svg.selectAll("g.cell").data(hierarchy).exit().remove();
-        }
+	    };
 	    _chart.width = function (w) {
             if (!arguments.length) return _width;
             _width = w;

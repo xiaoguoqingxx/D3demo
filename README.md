@@ -287,9 +287,9 @@
                 return "已停止";
             });
         })
-      注：.on() 用来监听过渡  
-            start - 过渡开始时.
-            end - 过渡结束后.
+      注：.on()   用来监听过渡  
+            start     - 过渡开始时.
+            end       - 过渡结束后.
             interrupt - 过渡被中断. 
           .each() 为过渡中的每个元素调用指定的函数
           .call() 调用一次指定的函数 
@@ -461,7 +461,7 @@
         d3.v3:
            d3.layout.stack().offset('expend')(data); 
           ※offset:偏移 silhouette wiggle expand zero  
-    #箱形图  graph07.html 有问题--图已显示标题显示不出
+    #箱形图  graph07.html  问题已完全解决
       第一步 构建一个具有根节点的新的层级结构数据
         d3.hierarchy(data)  data是已知的数据  格式要求json
           d3.hierarchy返回的数据包含以下属性:
@@ -541,7 +541,7 @@
       第三步 在选择的元素里加载数据
         .data(xxx.leaves())
           .leaves() 返回以当前节点为根节点的子树的所有叶节点
-    #树图    graph08.html 有问题--点击节点收起的问题
+    #树图    graph08.html 有问题--点击节点收起的问题 还是无法解决 d3.v3写法 tree.html
       第一步 构建一个具有根节点的新的层级结构数据
         d3.hierarchy(data)  data是已知的数据  格式要求json
       第二步 构建树结构生成器
@@ -553,12 +553,18 @@
         例：_link = d3.linkHorizontal()
           .x(function(d) { return d.y; })
           .y(function(d) { return d.x; });
-
-
-
-
-
-
+    #封闭图  graph09.html
+      第一步 构建一个具有根节点的新的层级结构数据
+        var hierarchy=d3.hierarchy(data)  data是已知的数据  格式要求json 
+      第二步 构建封闭结构生成器 
+        var pack=d3.pack()
+         .size([_r,_r]) //设置范围
+         .padding(3)    //设置间距 
+      第三步 渲染数据和图
+         pack(hierarchy
+          .sum(function(d) { return d.size; })
+              .sort(function(a, b) { return b.value - a.value; }))descendants(); 
+      *注：d3.v3 .value() 相当于 .sum(function(d) { return d.size; })*            
 
 
 
