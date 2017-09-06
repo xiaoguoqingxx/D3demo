@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>交互--多点触摸设备 有问题</title>
+    <style>
+        body,html{
+            width: 100%;
+            height: 100%;
+            overflow:hidden;
+        }
+        *{margin:0;padding:0;}
+    </style>
+    <link rel="stylesheet" href="css/main.css">
+
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+       
+</body>
+<script type="text/javascript">
+    var r=400,initR=100,thinkness=20;
+    var svg=d3.select("body").append('svg');
+    var width=d3.window(window).window.innerWidth,height=d3.window(window).window.innerHeight;
+    window.onresize=function() {
+        var width=d3.window(window).window.innerWidth,height=d3.window(window).window.innerHeight;
+        svg.attr("width",width).attr("height",height);
+    }
+    svg.attr("width",width).attr("height",height);
+    
+    d3.select("body").on("touchstart",touch)
+       .on("touchend",touch);
+    function touch() {
+        d3.event.preventDefault();
+        var arc=d3.arc().outerRadius(initR).innerRadius(initR-thinkness);
+        var g=svg.selectAll("g.touch")
+         .data(d3.touches(svg.node()));
+
+        var trans=g.enter().append('g').attr("class","touch")
+         .attr("transform",function(d) {
+             return "translate("+d[0]+","+d[1]+")";
+         })
+         .append('path')
+           .attr("class","arc")
+           .transition().duration(2000)
+            .attrTween("d",function (d) {
+                var interpolate=d3.interpolate({startAngle:0,endAngle:0},{startAngle:0,endAngle:2*Math.PI});
+                return function(t) {
+                    return arc(interpolate(t));
+                };
+            });
+            // if(d3.event!==null && d3.event.type=="touchstart"){
+
+            // };             
+            
+        g.exit().remove().each(function() {
+            this.__stopped__=true;
+        });
+        console.log(g)
+        if(g._exit[0].length!==0 && !g._exit[0][0].__stopped__){
+            trans.on("end",function(d) {
+              console.log(g);
+              ripples(d);
+              g.remove();
+            }); 
+        }
+                  
+    }
+
+    // function complete(g,d) {
+    //     // console.log(g.node())
+    //     ripples(d); 
+    // }
+    function ripples(position) {
+        for(var i=0;i<5;i++){
+            var circle=svg.append('circle')
+              .attr("cx",position[0])
+              .attr("cy",position[1])
+              .attr("fill","#2EB0FF")
+              .attr("fill-opacity",1)
+              .attr("r",initR-(thinkness/2))
+              .style("stroke-width",thinkness/(i))
+              .transition()
+                 .delay(Math.pow(i,2.5)*10)
+                 .duration(1000)
+                 .ease(d3.easeQuadIn)
+              .attr("r",r)
+              .attr("fill","#D0E0F2")
+              .attr("fill-opacity",0)
+              .style("stroke-opacity",0)
+              .on("end",function () {
+                 d3.select(this).remove();
+              });
+        }
+    }
+</script>
+</html>

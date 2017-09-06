@@ -39,6 +39,7 @@
             d3.select().html()    改变HTML
             d3.select().append()  添加元素
             d3.select().each(function(d,i){}) 选集迭代 d 数据绑定 i 下标索引  this指向当前的dom元素
+
 ## D3 与数据同行   
     	d3.select().data(data) 处理可视化了的数据 (更新)
     	d3.select().data(data).enter() 处理未被可视化的数据 (进入)
@@ -84,6 +85,7 @@
                 }
             }) 
           json函数可以访问服务端数据   
+
 ## D3 张弛有‘度’ 
     #数值尺度（线性尺度、幂级尺度、对数尺度）test05.html
       [线性尺度] 
@@ -178,6 +180,7 @@
           color(0.49); // "brown"
           color(0.51); // "steelblue"
       将定义域切割为与值域长度相等的几部分映射到值域 
+
 ## D3 玩转坐标轴
     #坐标轴创建  test12.html test13.html 
       1.创建svg元素，并添加宽高以及样式
@@ -201,6 +204,7 @@
         .tickSizeInner([size])  设置内侧刻度大小
         .tickSizeOuter([size])  设置外侧刻度大小
     #坐标轴--网格绘制以及动态改变坐标轴scale  test14.html test15.html 
+
 ## D3 优雅变换
 
     ☞单元素动画  animate01.html
@@ -407,6 +411,7 @@
             }
         });
         
+
 ## D3 图表
     #折线图  graph01.html  
     #散点图  graph02.html
@@ -564,7 +569,22 @@
          pack(hierarchy
           .sum(function(d) { return d.size; })
               .sort(function(a, b) { return b.value - a.value; }))descendants(); 
-      *注：d3.v3 .value() 相当于 .sum(function(d) { return d.size; })*            
+      *注：d3.v3 .value() 相当于 .sum(function(d) { return d.size; })* 
+
+## D3 人机交互  
+    #事件监听 trans01.html
+      selection.on([事件(string)],[回调(function)])     
+      d3.mouse([容器])  获取鼠标在给出的容器中的当前位置 返回[x,y]
+      selection.nodes() 将选择集中的非null元素以数组的形式返回
+      selection.node() 将选择集中的第一个非null元素返回 将选集转化为 元素本身
+    #多点触摸设备 trans02.html 有问题---监听过渡和打断过渡 
+      d3.event
+        ****** 官方释义 *******
+         当前的event, 如果有的话. 这个属性再事件发生时被设置, 并在事件回调结束后被重置. 可以使用这个来访问标准的事件对象属性，比如event.timeStamp 以及方法比如 event.preventDefault. 也可以使用 event.pageX 和 event.pageY, 这个是很方便的因为不需要使用d3.mouse, d3.touch 或 d3.touches对原生事件对象进行坐标转换 .
+        ****** 官方释义 *******
+      d3.event.type 事件类型
+      d3.event.preventDefault() 阻止触发默认事件
+      ※d3.touches(svg.node())  获取一系列的触控位置数组  二维数组
 
 
 
