@@ -577,7 +577,7 @@
       d3.mouse([容器])  获取鼠标在给出的容器中的当前位置 返回[x,y]
       selection.nodes() 将选择集中的非null元素以数组的形式返回
       selection.node() 将选择集中的第一个非null元素返回 将选集转化为 元素本身
-    #多点触摸设备 trans02.html 有问题---监听过渡和打断过渡 
+    #多点触摸设备 trans02.html touch.html 有问题---监听过渡和打断过渡 
       d3.event
         ****** 官方释义 *******
          当前的event, 如果有的话. 这个属性再事件发生时被设置, 并在事件回调结束后被重置. 可以使用这个来访问标准的事件对象属性，比如event.timeStamp 以及方法比如 event.preventDefault. 也可以使用 event.pageX 和 event.pageY, 这个是很方便的因为不需要使用d3.mouse, d3.touch 或 d3.touches对原生事件对象进行坐标转换 .
@@ -585,6 +585,25 @@
       d3.event.type 事件类型
       d3.event.preventDefault() 阻止触发默认事件
       ※d3.touches(svg.node())  获取一系列的触控位置数组  二维数组
+    #缩放和平移 trans03.html
+      d3.zoom() 创建一个zoom操作。返回一个zoom对象方法，通常被传递给selection.call来调用。
+        start room end
+      selection.call(d3.zoom().on("zoom", zoomed)) on绑定zoom 并执行zoomed方法
+      selection.on(".zoom", null);取消缩放和平移
+      selection.call(zoom).on("wheel.zoom", null); 移除滚轮事件
+      selection.call(zoom).on("wheel", function() { d3.event.preventDefault(); });
+           阻止浏览器默认的滚轮事件
+      zoom.scaleExtent([extent])  设置或获取缩放范围。默认为[0, ∞]
+    #拖拽      trans04.html
+      d3.drag() 创建一个新的拖拽操作，返回一个drag, 它是一个对象方法。
+                  一般通过 selection.call将其应用在指定的选择集上。
+          start drag end 
+      d3.selectAll(".node").call(d3.drag().on("start", started));
+      selection.on(".drag", null);取消拖拽
+
+## D3 使用原力  难度较大
+    一、引力和作用力
+
 
 
 
