@@ -51,7 +51,6 @@
 	        _x = x;
 	        return _chart;
 	    };
-
 	    _chart.y = function (y) {
 	        if (!arguments.length) return _y;
 	        _y = y;
@@ -127,7 +126,7 @@
 	    		    .attr("clip-path","url(#body-clip)")
 	    	}
 	    	// 创建堆叠数据
-	    	var stack=d3.stack().keys(["y","y1","y2"]).order(d3.stackOrderNone).offset(d3.stackOffsetNone);
+	    	var stack=d3.stack().keys(["y","y1","y2","y3"]).order(d3.stackOrderNone).offset(d3.stackOffsetNone);
 	    	renderLines(stack(_data));
 	    	renderAreas(stack(_data));
 	    	
@@ -210,29 +209,15 @@
 	    data = [];
     var chart=stackedAreaChart()
         .x(d3.scaleLinear().domain([0,numberOfDataPoint-1])) 
-        .y(d3.scaleLinear().domain([0,60]));		
+        .y(d3.scaleLinear().domain([0,85]));		
    	for (var s = 0; s <numberOfDataPoint; ++s)
 	    data.push({x:s,y:randomData()});
 	data.forEach(function(val,k) {
 		var random=val.y+randomData();
 		val.y1=random;
-		val.y2=random+randomData();
+		val.y2=val.y1+randomData();
+		val.y3=val.y2+randomData();
 	})
-	// for (var i = 0; i < numberOfSeries; ++i)
-	//     data.push(d3.range(numberOfDataPoint).map(function (i) {
-	//         return {x: i, y: randomData()};
-	//     }));
-    console.log(data)
- //    function update() {
-	//     for (var i = 0; i < data.length; ++i) {
-	//         var series = data[i];
-	//         series.length = 0;
-	//         for (var j = 0; j < numberOfDataPoint; ++j)
-	//             series.push({x: j, y: randomData()});
-	//     }
-
-	//     chart.render();
-	// }
 	function update() {
 	    for (var i = 0; i < data.length; ++i) {
 	        var series = data[i];
@@ -240,6 +225,7 @@
 	        series.y=randomData();
 	        series.y1=series.y+randomData();
 	        series.y2=series.y1+randomData();
+	        series.y3=series.y2+randomData();
 	    }
 
 	    chart.render();
