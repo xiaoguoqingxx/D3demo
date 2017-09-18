@@ -602,7 +602,136 @@
       selection.on(".drag", null);取消拖拽
 
 ## D3 使用原力  难度较大
-    一、引力和作用力
+    一、引力和作用力  d3.v4--force01-1.html  d3.v3--force01.html
+      第一步 创建力模拟器  d3.v4为例
+        d3.forceSimulation(nodeData)
+      参数详解：
+        simulation.restart() 重启仿真模拟器（仿真内部的计时器）
+        simulation.stop()    停止仿真模拟器（仿真内部的计时器）
+        simulation.nodes([nodes])  
+          如果指定了nodes，则根据当前的nodes对象数组初始化仿真的节点初始位置和速度。如果没有指定nodes则根据指定的构造器返回节点对象数组。每个节点为一个对象类型，以下几个属性是通过仿真模拟器添加的：
+              index - 节点的索引
+              x - 节点当前的 x-位置
+              y - 节点当前的 y-位置
+              vx - 节点当前的 x-速度
+              vy - 节点当前的 y-速度
+          如果要为某个节点设置默认的位置，则需要为该节点设置如下两个属性:
+              fx - x-位置
+              fy - y-位置
+        simulation.alpha([alpha]) 速度衰减初始值
+        simulation.alphaMin([min])  设置或获取最小的 alpha值  当初始值小于它 停止仿真模拟器
+        simulation.alphaDecay([decay]) 
+          1.设置或获取衰减系数，用来设置alpha的衰减率。默认为0.0228… 
+          2.衰减系数用来决定从当前alpha值到alphaTarget值的过渡快慢。衰减系数越大，仿真的过程越短，当然效果会越差。 衰减系数越小，则仿真过程越长，最终的效果也就越好。
+          3.如果想要仿真永远运行，则设置decay为0，此时仿真的alpha保持不变。
+        simulation.alphaTarget([target]) 
+          alpha的目标值，区间为[0,1]. 默认为0
+        simulation.velocityDecay([decay])
+          速度衰减系数，相当于摩擦力。区间为[0,1], 默认为0.4。在每次tick之后，节点的速度都会等于当前速度乘以1-velocityDecay,和alpha衰减类似，速度衰减越慢最终的效果越好，但是如果速度衰减过慢，可能会导致震荡。
+        simulation.force(name[, force])  添加力
+        simulation.find(x, y[, radius]) 
+          返回离⟨x,y⟩ 点最接近的节点，可以指定一个搜索半径radius,radius默认无穷大。
+        simulation.on(typenames, [listener])
+          设置或获取事件监听器。事件监听器通过type.names的形式指定，也就是同一种type可以根据name指定多个事件监听器。type有如下两种:
+            tick - 每次tick时调用.
+            end - 仿真结束时调用，也就是 alpha < alphaMin.
+          tick事件不会由simulation.tick触发，仅仅可以通过内部计时器触发。 
+      第二步 添加力 d3.v4为例
+        ##Centering 平衡力
+          定义：centering作用力可以使得节点布局开之后围绕某个中心。相当于某个中心点对所有的节点都有一个制约，不会让布局的中心偏离。
+              
+          center=d3.forceCenter(x, y)  
+             根据指定的x- 和 y-坐标创建一个centering作用力。默认为⟨0,0⟩
+          center.x([x]) 设置或获取center力的x坐标，默认为0
+          center.y([y]) 设置或获取center力的y坐标，默认为0
+        ##Collision 碰撞力
+          定义：碰撞作用力可以为节点指定一个radius区域来防止节点重叠, 而不是一个位置坐标。也就是节点a and b之间的距离至少为radius(a) + radius(b). 为了减少抖动，可以设置strength(碰撞强度) 和 iteration count(迭代次数)两个参数.
+            
+          collide=d3.forceCollide([radius]) 
+             使用默认的半径创建一个碰撞作用力。radius默认所有的节点都为1
+          collide.radius([radius]) 为指定节点设置一个碰撞半径，可以为节点分别设置不同的半径。
+          collide.strength([strength])  设置碰撞力的强度，范围[0,1], 默认为0.7。
+          collide.iterations([iterations]) 
+             设置或获取迭代次数，默认为1，迭代次数越多最终的布局效果越好，但是计算复杂度更高，迭代次数越低，则计算复杂度越小，最终的效果也就越差。默认为1
+        ##Links 连接力
+          定义：link作用力可以根据期望的link distance(连接距离)将节点连接在一起。作用力的强度与节点之间的距离成正比，类似于弹簧作用力。
+           
+          link=d3.forceLink([links])  
+             为指定的link数组创建一个link作用力。如果没有指定连接关系数组则默认为空
+          link.links([links])
+            设置或获取link作用力的连接数组并重新计算distance 和 strength. 如果没有指定links则返回当前的links数组，默认为空.
+            每个link都是包含以下两个属性的对象:
+              source - 源数节点，参考 simulation.nodes
+              target - 目标节点，参考 simulation.nodes
+              index - 在links数组中的索引
+            为方便起见，每个连接的源和目的可以是数字索引或者字符串标示符。参考link.id.
+            如果links数组发生了改变，比如添加或删除一个link时则必须重新调用这个方法
+          link.id([id]) 
+            设置或获取link中节点的查找方式，默认使用node.index:
+                function id(d) {
+                  return d.index;
+                }
+            默认的id访问器允许将source和target设置为基于nodes数组的索引形式，比如:
+                var nodes = [
+                  {"id": "Alice"},
+                  {"id": "Bob"},
+                  {"id": "Carol"}
+                ];
+                var links = [
+                  {"source": 0, "target": 1}, // Alice → Bob
+                  {"source": 1, "target": 2} // Bob → Carol
+                ];
+            也可以使用唯一的字符串来表示，比如:
+                function id(d) {
+                  return d.id;
+                }
+            然后可以使用每个节点的id属性的值设置为source和target值:
+                var nodes = [
+                  {"id": "Alice"},
+                  {"id": "Bob"},
+                  {"id": "Carol"}
+                ];
+                var links = [
+                  {"source": "Alice", "target": "Bob"},
+                  {"source": "Bob", "target": "Carol"}
+                ];
+          link.distance([distance]) 设置或获取两个节点之间的距离，默认为:30
+          link.strength([strength]) 设置或获取link的强度，默认：
+              function strength(link) {
+                return 1 / Math.min(count(link.source), count(link.target));
+              }
+              count(node)是一个返回与节点链接的其他节点的数量(节点的度)。这样的默认设置是为了当一个节点度很大时减小强度，提高稳定性。
+          link.iterations([iterations]) 
+            设置或获取迭代次数，默认为1. 迭代次数越多，最终的仿真效果越好，计算复杂度也越高。
+        ##Many-Body 相互作用力 引力与斥力
+          定义：many-body(多体)作用力应用在所用的节点之间，当strength为正的时候可以模拟重力，当为负的时候可以模拟电荷力。这个实现使用四叉树和Barnes–Hut approximation的方法提高了性能。精确度可以通过theta来控制.与link不同，link作用力仅仅会影响有连接关系的两个节点，而电荷力是全局的，任何两个节点之间都有力的影响。
+           
+          manyBody=d3.forceManyBody() 使用默认的设置构建一个多体作用力。
+          manyBody.strength([strength])  设置或获取强度参数 正--引力  负--斥力
+          manyBody.theta([theta])  设置或获取theta参数。默认为0.9 一般不变 
+          manyBody.distanceMin([distance])  设置或获取最小连接距离
+          manyBody.distanceMax([distance])  设置或获取最大连接距离
+        ##Positioning 位置力 维度力
+          定义：x 和 y position作用力可以将作用力限制在一个维度，x方向或y方向。
+           
+          x=d3.forceX([x]) 
+            根据给定的x位置创建一个x方向的作用力。如果没有指定x则默认为0
+          x.strength([strength])
+            设置或获取力的强度访问器，strength决定了节点x方向的速度增量:(x - node.x) × strength, 这个值越大则节点的位置会越快的朝向目标位置过渡，默认为0.1
+          x.x([x]) 设置或获取x坐标访问器
+          y=d3.forceY([y]) 
+            根据给定的y位置创建一个y方向的作用力。如果没有指定y则默认为0
+          y.strength([strength])
+            设置或获取力的强度访问器，strength决定了节点x方向的速度增量:(y - node.y) × strength, 这个值越大则节点的位置会越快的朝向目标位置过渡，默认为0.1
+          y.y([y]) 设置或获取y坐标访问器 
+
+
+
+ 
+
+
+
+
 
 
 
