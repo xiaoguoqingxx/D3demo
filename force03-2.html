@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1"/>
+    <title>连接力 有问题</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css"/>
+    <script type="text/javascript" src="js/d3.v4.min.js"></script>
+
+    <style type="text/css">
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        circle {
+            fill: steelblue;
+        }
+
+        .line {
+            stroke: grey;
+        }
+    </style>
+</head>
+
+<body>
+
+<script type="text/javascript">
+    
+    var w=window.innerWidth,h=window.innerHeight;
+    var simulation = d3.forceSimulation()
+        // .force("center",d3.forceCenter(w/2, h/2))
+        .force("charge",d3.forceManyBody())
+        .force("link",d3.forceLink())
+        .velocityDecay(0.3);
+            // .gravity(0.1)
+            // .charge(-30)
+            // .friction(0.95)
+            // .linkDistance(20)
+            // .linkStrength(1);
+
+    var duration = 10000;
+
+    var svg = d3.select("body").append("svg:svg");
+
+    simulation.on("tick", ticks);
+
+    function offset() {
+        return Math.random() * 100;
+    }
+    function ticks() {
+        svg.selectAll("circle")
+            .attr("cx", function (d) {return d.x;})
+            .attr("cy", function (d) {return d.y;});
+
+        svg.selectAll("line")
+            .attr("x1", function (d) {return d.source.x;})
+            .attr("y1", function (d) {return d.source.y;})
+            .attr("x2", function (d) {return d.target.x;})
+            .attr("y2", function (d) {return d.target.y;});
+    }
+    function createNodes(point) {
+        var numberOfNodes = Math.round(Math.random() * 10+5);
+        var nodes = [];
+        for (var i = 0; i < numberOfNodes; ++i) {
+            nodes.push({
+                x: point[0] + offset(), 
+                y: point[1] + offset()
+            });
+        }
+        return nodes;
+    }
+    function createLinks(nodes) {
+        var links = [];
+        for (var i = 0; i < nodes.length; ++i) {            
+            if(i == nodes.length - 1) 
+                links.push(
+                    {source: nodes[i], target: nodes[0]}
+                );
+            else
+                links.push(
+                    {source: nodes[i], target: nodes[i + 1]}
+                );
+        }
+        return links;
+    }
+    svg.on("click", function () {
+        var point = d3.mouse(this),
+                nodes = createNodes(point),
+                links = createLinks(nodes);
+        simulation = d3.forceSimulation(nodes)
+        // .force("center",d3.forceCenter(w/2, h/2))
+        .force("chargeA",d3.forceManyBody().strength(200))
+        .force("chargeB",d3.forceManyBody().strength(-250))
+        .force("link",d3.forceLink())
+        .velocityDecay(0.3).on("tick", ticks);      
+        simulation.nodes().forEach(function (node) {
+            svg.append("circle")
+                    .data([node])
+                .attr("class", "node")
+                .attr("cx", function (d) {return d.x;})
+                .attr("cy", function (d) {return d.y;})
+                .attr("r", 1e-6)
+                .call(d3.drag())
+                    .transition()
+                .attr("r", 7)
+                    .transition()
+                    .delay(duration)
+                .attr("r", 1e-6)
+                .on("end", function () {simulation.nodes().shift(); simulation.restart();})
+                .remove();
+        });
+        simulation.force("link").links(links).distance(20).strength(1);
+        links.forEach(function (link) {
+            svg.append("line")
+                    .data([link])
+                .attr("class", "line")
+                .attr("x1", function (d) {return d.source.x;})
+                .attr("y1", function (d) {return d.source.y;})
+                .attr("x2", function (d) {return d.target.x;})
+                .attr("y2", function (d) {return d.target.y;})
+                    .transition()
+                    .delay(duration)
+                .style("stroke-opacity", 1e-6)
+                .on("end", function () {links.shift();simulation.force("link").links(links).distance(20).strength(1); ;simulation.restart();})
+                .remove();
+        });
+        // nodes.forEach(function (n) {simulation.nodes().push(n);});
+        // links.forEach(function (l) {force.links().push(l);});
+        simulation.restart();
+    }); 
+</script>
+
+</body>
+
+</html>
