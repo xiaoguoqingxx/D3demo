@@ -1,16 +1,16 @@
 ## D3 我的选择我做主 test01.html
-     #选择单个元素 : d3.select(d3选择器) 
+    #选择单个元素 : d3.select(d3选择器) 
         d3选择器 #foo,button,.foo,[type=text],li a,li#foo,
                 li.goo,li:first-child,li:nth-child(1)
-     #选择多个元素 : d3.selectAll(d3选择器)
-     #选集迭代： .each()
+    #选择多个元素 : d3.selectAll(d3选择器)
+    #选集迭代： .each()
     	  例：d3.selectAll("div").attr("class","red box").each(function(d,i) {
     	        d3.select(this).append("h1").text(i)
     	    }); 
-     #子元素选择：
+    #子元素选择：
         例：d3.select("#section1>div").attr("class","blue box");
             d3.select("#section2").style(...).select("div").attr("class","red box"); 方便分层处理   
-     #修饰函数
+    #修饰函数
           d3.select().style() 绑定样式（可以动态绑定）
             这种通过匿名函数动态设置属性、样式值的方法常用来绑定数据。
         	例：d3.selectAll("p").style("color", function(d, i) {
@@ -47,7 +47,7 @@
     #数组处理 test02.html
     	d3.min()     最小值
     	d3.max()     最大值
-    	d3.extend()  同时返回最大最小值
+    	d3.extent()  同时返回最大最小值
     	d3.sum()     求和
     	d3.median()  中间值
     	d3.mean()    平均值
@@ -268,7 +268,7 @@
           })
 
     ☞级联过渡    animate05.html
-      d3.selections.transition().duration(1500).---.transition().duration(1500)
+        d3.selections.transition().duration(1500).---.transition().duration(1500)
 
     ☞选择性过渡    animate06.html
         .transition() // <- A
@@ -601,7 +601,7 @@
       d3.selectAll(".node").call(d3.drag().on("start", started));
       selection.on(".drag", null);取消拖拽
 
-## D3 使用原力  难度较大
+## D3 使用原力  难度较大 d3.v4 有坑
     一、关于力  d3.v4--force01-1.html 
       第一步 创建力模拟器  d3.v4为例
         d3.forceSimulation(nodeData)
@@ -766,6 +766,86 @@
         10、 force.on(type, listener)
           绑定事件 仅支持"start"，"tick"和"end"事件
         11、force.drag() 拖动事件 初始化时调用node.call(force.drag)
+
+## D3 地图的奥秘 难度较大 
+     一、地理路径生成器（path） map01.html
+        path=d3.geoPath([projection[, context]])
+           使用默认的设置构建一个地理路径生成器。可以指定 投影方式和上下文
+        path()可以指定渲染对象
+           可以为一个GeoJSON特征或几何对象
+              Point - 一个单一的点
+              MultiPoint - 一组点
+              LineString - 一组线条上的连续的点
+              MultiLineString - 多条线条的上的一组点
+              Polygon - 表示一个多边形的一组点
+              MultiPolygon - 一个表示多个多边形的多维数组
+              GeometryCollection - 一个几何对象数组
+              Feature - 一个表示几何对象的特征
+              FeatureCollection - 一组特征对象
+        path.area(object)  返回指定GeoJSON对象投影的面的面积(平方像素)
+        path.bounds(object)  返回指定GeoJSON对象投影面的包围框
+        path.centroid(object)  返回指定GeoJSON对象投影面的几何中心
+        path.projection([projection]) 
+             设置或获取地理路径生成器的投影方式, 默认为null. 投影方式为null时候也就是直接将经纬度当屏幕坐标使用。
+        path.context([context]) 
+           如果指定了context则设将路径信息保存到指定的上下文中。context一定要包含CanvasRenderingContext2D API的以下方法:
+              context.beginPath()
+              context.moveTo(x, y)
+              context.lineTo(x, y)
+              context.arc(x, y, radius, startAngle, endAngle)
+              context.closePath()
+           如果没有指定context则返回当前的渲染上下文，默认为null
+        path.pointRadius([radius])  设置或获取点或者点集中点的半径大小
+    二、投影
+       投影的作用在于将球面多边形转为平面多边形，D3提供了几种标准的投影:
+          Azimuthal(方位角投影)
+          Composite(复合投影)
+          Conic(圆锥投影)
+          Cylindrical(圆柱投影)
+       projection(point) 根据指定的经纬度的[经度, 维度]返回一个投影后对应的屏幕点坐标[x, y]
+       projection.invert(point) 逆投影，根据坐标点返回经纬度
+       projection.stream(stream) 为指定的输出流返回一个projection stream(投影流) ？
+       projection.clipAngle([angle]) 
+          设置或获取投影的裁剪大圆的角度。如果angle为null则表示为antimeridian cutting(沿着180度经线)。
+       projection.clipExtent([extent])
+          设置或获取投影的视口裁剪范围。以[[x₀, y₀], [x₁, y₁]]的形式指定, x₀表示视口的左边界, y₀表示上边界, x₁ 表示右边界y₁ 表示下边界. 如果 extent为null,则表示不使用视口裁剪。
+       projection.scale([scale])  设置或获取投影的缩放因子
+       projection.translate([translate]) 设置或获取投影的平移偏移量。默认为[480, 250]。
+       projection.center([center]) 设置或获取投影的中心，参数以经纬度的形式指定。
+       projection.rotate([angles]) 
+          设置或获取投影的three-axis rotation(三轴旋转)。必须通过二元或三元数组指定，分别表示[lambda, phi, gamma]
+       projection.precision([precision])  设置或获取投影采样精度
+       projection.fitExtent(extent, object) 
+          自动设置投影的scale 和 translate来使得GeoJSON对象适应指定的extent 
+       projection.fitSize(size, object)
+          projection.fitExtent的一个简便方法(左上角坐标为[0,0]时)，如下两个是等价的：
+              projection.fitExtent([[0, 0], [width, height]], object);
+              projection.fitSize([width, height], object);
+    ****投影方式详解****   map01.html
+      1、方位角投影
+        等面积投影  d3.geoAzimuthalEqualArea()
+        等距投影    d3.geoAzimuthalEquidistant()
+        球心投影    d3.geoGnomonic()
+        正交投影    d3.geoOrthographic()
+        球面投影    d3.geoStereographic()
+      2、复合投影 （暂时不适用）
+         不支持projection.center, projection.rotate, projection.clipAngle, projection.clipExtent.
+        d3.geoAlbersUsa() 以美国为中心的d3.geoConicEqualArea 投影
+      3、圆锥投影
+        conic.parallels([parallels]) 双标准纬线定义了投影的地图布局。
+        阿尔伯斯投影  d3.geoAlbers()
+        兰伯特正形圆锥投影，双标准纬线默认为[30°, 30°]  d3.geoConicConformal()
+        双标准纬线等积圆锥投影  d3.geoConicEqualArea()
+        双标准纬线等距圆锥投影  d3.geoConicEquidistant() 
+      4、圆柱投影 
+        普通圆柱投影  d3.geoEquirectangular() 
+        默认projection.clipExtent为±85°经度的墨卡托投影  d3.geoMercator()
+        横向墨卡托投影  d3.geoTransverseMercator() 
+
+
+
+        
+ 
 
 
 

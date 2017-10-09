@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+    <title>地图--如何绘制地图 以及投影方式</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1"/>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        path {
+            fill: #E0FC99;
+            stroke: #31B1FF;
+            stroke-width: .5px;
+        }
+        path:hover {
+            fill: #FFEAA5;
+        }
+    </style>    
+    <script src="js/d3.v4.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/topojson.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+    <fieldset>
+        <legend>方位角投影</legend>
+        <button onClick="updata('equalarea')">等面积投影</button>
+        <button onClick="updata('equidistant')">等矩投影</button>
+        <button onClick="updata('gnomonic')">球心投影</button>
+        <button onClick="updata('orthographic')">正交投影</button>
+        <button onClick="updata('stereographic')">球面投影</button>        
+    </fieldset>
+    <fieldset>
+        <legend>圆锥投影</legend>
+        <button onClick="updata('albers')">阿尔伯斯投影</button>
+        <button onClick="updata('conformal')">兰伯特正形圆锥投影</button>
+        <button onClick="updata('conicequalarea')">双标准纬线等积圆锥投影</button>
+        <button onClick="updata('conicequidistant')">双标准纬线等矩圆锥投影</button>
+    </fieldset>   
+    <fieldset>
+        <legend>圆柱投影</legend>
+        <button onClick="updata('equirectangular')">普通圆柱投影</button>
+        <button onClick="updata('mercator')">墨卡托投影</button>
+        <button onClick="updata('transversemercator')">横向墨卡托投影</button>
+    </fieldset>   
+</body>
+<script type="text/javascript">
+	var  width=960,height=500;
+    projection=d3.geoAlbersUsa;
+
+	var path=d3.geoPath();
+	var svg=d3.select("body").append('svg')
+	        .attr("width",width)
+	        .attr("height",height);
+	var g=svg.append('g')
+	       .call(
+                     d3.zoom()
+                    .scaleExtent([1, 10])
+                    .on("zoom", zoom)
+	       	);
+   updata("equalarea") 
+   function updata(way) {
+        d3.json("geojson/area/world.json", function(error, data) {
+            g.selectAll("path").remove();
+            if (error) throw error;
+            var projection={'equalarea':d3.geoAzimuthalEqualArea(),'equidistant':d3.geoAzimuthalEquidistant(),'gnomonic':d3.geoGnomonic(),'orthographic':d3.geoOrthographic(),'stereographic':d3.geoStereographic(),'albers':d3.geoAlbers(),'conformal':d3.geoConicConformal(),'conicequalarea':d3.geoConicEqualArea(),'conicequidistant':d3.geoConicEquidistant(),'equirectangular':d3.geoEquirectangular(),'mercator':d3.geoMercator(),'transversemercator':d3.geoTransverseMercator()}[way] || d3.geoAzimuthalEqualArea(); 
+            projection.rotate([-90,0,0]);
+            projection.fitSize([width, height], data)        
+            g.selectAll("path")
+             .data(data.features)
+             .enter().append('path').attr("d",path.projection(projection));
+             console.log(path.area(data))
+             console.log(path.bounds(data))
+        })
+   }
+	
+ //    d3.json("us.json", function(error, us) {
+	//     if (error) throw error;
+	//     g.selectAll("path")
+	//      .data(topojson.feature(us, us.objects.states).features)
+	//      .enter().append('path').attr("d",path);
+	// })	
+    function zoom() {
+        svg.attr("transform", d3.event.transform);         
+    }  	
+</script>
+</html>
